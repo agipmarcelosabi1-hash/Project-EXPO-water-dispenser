@@ -2806,6 +2806,106 @@
         }
     
         /* ============================================================
+           AUTH METHOD SELECTOR
+           ============================================================ */
+        .auth-methods {
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:.85rem;
+            margin:1.35rem 0 .9rem;
+        }
+        .auth-method-btn {
+            position:relative;
+            display:flex;
+            align-items:center;
+            gap:.8rem;
+            width:100%;
+            min-height:96px;
+            padding:1rem;
+            text-align:left;
+            color:var(--foam);
+            background:linear-gradient(145deg,rgba(14,45,66,.78),rgba(4,18,29,.92));
+            border:1px solid var(--stroke);
+            border-radius:16px;
+            cursor:pointer;
+            transition:transform .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease;
+        }
+        .auth-method-btn:hover {
+            transform:translateY(-2px);
+            border-color:var(--stroke-strong);
+            box-shadow:0 12px 30px -20px rgba(0,0,0,.8),0 0 20px rgba(43,227,209,.07);
+        }
+        .auth-method-btn:focus-visible {
+            outline:2px solid var(--aqua);
+            outline-offset:3px;
+        }
+        .auth-method-btn .method-icon {
+            width:46px; height:46px; flex:0 0 46px;
+            display:grid; place-items:center;
+            border-radius:14px;
+            color:var(--aqua);
+            background:rgba(43,227,209,.09);
+            border:1px solid rgba(43,227,209,.22);
+            font-size:1.15rem;
+        }
+        .auth-method-btn .method-title {
+            display:block;
+            font:700 .88rem 'Space Grotesk',sans-serif;
+        }
+        .auth-method-btn .method-desc {
+            display:block;
+            margin-top:.2rem;
+            color:var(--mist);
+            font:500 .59rem 'Space Mono',monospace;
+            line-height:1.45;
+        }
+        .auth-method-badge {
+            position:absolute; top:.55rem; right:.6rem;
+            font:700 .5rem 'Space Mono',monospace;
+            letter-spacing:.08em;
+            text-transform:uppercase;
+            color:var(--aqua);
+            opacity:.8;
+        }
+        .auth-method-panel {
+            display:none;
+            animation:authPanelIn .35s cubic-bezier(.16,1,.3,1);
+        }
+        .auth-method-panel.active { display:block; }
+        @keyframes authPanelIn {
+            from { opacity:0; transform:translateY(10px); }
+            to { opacity:1; transform:translateY(0); }
+        }
+        .auth-back-btn {
+            display:inline-flex; align-items:center; gap:.45rem;
+            margin:0 auto 1rem;
+            padding:.48rem .72rem;
+            border-radius:999px;
+            border:1px solid var(--stroke);
+            background:rgba(140,205,222,.04);
+            color:var(--mist);
+            cursor:pointer;
+            font:700 .58rem 'Space Mono',monospace;
+            transition:border-color .2s ease,color .2s ease,transform .2s ease;
+        }
+        .auth-back-btn:hover {
+            color:var(--foam);
+            border-color:var(--stroke-strong);
+            transform:translateY(-1px);
+        }
+        .auth-choice-note {
+            margin-top:.8rem;
+            color:var(--mist);
+            font:500 .58rem 'Space Mono',monospace;
+            line-height:1.5;
+        }
+        .auth-choice-note i { color:var(--aqua); margin-right:.25rem; }
+        @media(max-width:560px){
+            .auth-methods { grid-template-columns:1fr; }
+            .auth-method-btn { min-height:86px; }
+        }
+
+        /* ============================================================
            FACE ID / FACE RECOGNITION
            ============================================================ */
         .face-access {
@@ -2961,7 +3061,37 @@
     <div id="voice-gate" aria-label="Kontrol suara">
         <div class="panel voice-gate-card">
 
+            <div id="auth-method-chooser" class="auth-method-chooser">
+                <div class="panel-eyebrow voice-gate-eyebrow" style="display:flex;">Metode Akses</div>
+                <h1 class="voice-gate-title">Pilih Metode Akses</h1>
+                <p class="voice-gate-sub">Pilih satu metode untuk masuk ke dashboard. Modul yang tidak dipilih tetap tersembunyi agar proses lebih cepat dan sederhana.</p>
+
+                <div class="auth-methods" role="group" aria-label="Pilih metode autentikasi">
+                    <button id="auth-voice-btn" class="auth-method-btn" type="button">
+                        <span class="method-icon"><i class="fa-solid fa-microphone"></i></span>
+                        <span>
+                            <span class="method-title">Voice Control</span>
+                            <span class="method-desc">Ucapkan perintah untuk membuka dashboard.</span>
+                        </span>
+                        <span class="auth-method-badge">VOICE</span>
+                    </button>
+
+                    <button id="auth-face-btn" class="auth-method-btn" type="button">
+                        <span class="method-icon"><i class="fa-solid fa-face-smile"></i></span>
+                        <span>
+                            <span class="method-title">Face ID</span>
+                            <span class="method-desc">Verifikasi wajah menggunakan webcam.</span>
+                        </span>
+                        <span class="auth-method-badge">CAMERA</span>
+                    </button>
+                </div>
+
+                <div class="auth-choice-note"><i class="fa-solid fa-shield-halved"></i> Pilihan ini hanya menentukan cara masuk. Dashboard tetap menggunakan sistem sensor yang sama.</div>
+            </div>
+
             <!-- ===== FACE ID ACCESS ===== -->
+            <div class="auth-method-panel auth-face-panel" id="face-access-panel">
+            <button id="auth-back-face" class="auth-back-btn" type="button"><i class="fa-solid fa-arrow-left"></i> Ganti metode</button>
             <div class="face-access" id="face-access">
                 <div class="face-access-head">
                     <div class="face-access-title">
@@ -3007,6 +3137,10 @@
                 </div>
             </div>
 
+            </div>
+
+            <div class="auth-method-panel auth-voice-panel" id="voice-access-panel">
+            <button id="auth-back-voice" class="auth-back-btn" type="button"><i class="fa-solid fa-arrow-left"></i> Ganti metode</button>
             <div class="panel-eyebrow voice-gate-eyebrow" style="display:flex;">Asisten Suara</div>
             <h1 class="voice-gate-title">Dashboard Terkunci</h1>
             <p class="voice-gate-sub">Ucapkan perintah suara untuk membuka dashboard. Tekan mikrofon untuk mulai mendengarkan.</p>
@@ -3045,8 +3179,9 @@
 
             <div class="voice-command-list">
                 <div class="voice-command-row"><i class="fa-solid fa-quote-left"></i> <span>Ucapkan <span class="cmd">"buka dashboard"</span> untuk membuka konsol</span></div>
-                <div class="voice-command-row"><i class="fa-solid fa-face-smile"></i> <span>Atau gunakan <span class="cmd">Face ID</span> dengan webcam laptop</span></div>
-                <div class="voice-command-row"><i class="fa-solid fa-quote-left"></i> <span>Ucapkan <span class="cmd">"buka anggota kelompok"</span> untuk melihat data anggota</span></div>
+                <div class="voice-command-row"><i class="fa-solid fa-keyboard"></i> <span>Perintah chat menggunakan parser yang sama seperti voice</span></div>
+                <div class="voice-command-row"><i class="fa-solid fa-shield-halved"></i> <span>Face ID tersedia sebagai metode alternatif</span></div>
+            </div>
             </div>
         </div>
     </div>
@@ -3693,6 +3828,55 @@
         })();
 
 
+        // ================== AUTH METHOD SELECTOR ==================
+        (function initAuthMethodSelector() {
+            const chooser = document.getElementById('auth-method-chooser');
+            const voicePanel = document.getElementById('voice-access-panel');
+            const facePanel = document.getElementById('face-access-panel');
+            const voiceBtn = document.getElementById('auth-voice-btn');
+            const faceBtn = document.getElementById('auth-face-btn');
+            const backVoice = document.getElementById('auth-back-voice');
+            const backFace = document.getElementById('auth-back-face');
+
+            function selectMethod(method) {
+                const voice = method === 'voice';
+                const face = method === 'face';
+
+                window.selectedAuthMethod = method;
+                if (chooser) chooser.style.display = 'none';
+                if (voicePanel) voicePanel.classList.toggle('active', voice);
+                if (facePanel) facePanel.classList.toggle('active', face);
+
+                if (voice && window.faceAccess && typeof window.faceAccess.stop === 'function') {
+                    window.faceAccess.stop(false);
+                }
+                if (face && typeof window.voiceAssistant?.stopListening === 'function') {
+                    window.voiceAssistant.stopListening();
+                }
+            }
+
+            function showChooser() {
+                window.selectedAuthMethod = null;
+                if (chooser) chooser.style.display = '';
+                if (voicePanel) voicePanel.classList.remove('active');
+                if (facePanel) facePanel.classList.remove('active');
+
+                if (window.voiceAssistant && typeof window.voiceAssistant.stopListening === 'function') {
+                    window.voiceAssistant.stopListening();
+                }
+                if (window.faceAccess && typeof window.faceAccess.stop === 'function') {
+                    window.faceAccess.stop(false);
+                }
+            }
+
+            voiceBtn?.addEventListener('click', () => selectMethod('voice'));
+            faceBtn?.addEventListener('click', () => selectMethod('face'));
+            backVoice?.addEventListener('click', showChooser);
+            backFace?.addEventListener('click', showChooser);
+
+            window.authMethodSelector = { select: selectMethod, showChooser };
+        })();
+
         // ================== FACE ID / FACE RECOGNITION ==================
         (function initFaceRecognition() {
             const video = document.getElementById('face-video');
@@ -3872,6 +4056,7 @@
                         stopCamera(false);
 
                         setTimeout(() => {
+                            window.selectedAuthMethod = 'face';
                             if (window.voiceAssistant &&
                                 typeof window.voiceAssistant.openDashboard === 'function') {
                                 window.voiceAssistant.openDashboard();
@@ -3893,6 +4078,7 @@
             }
 
             async function startFaceID() {
+                window.selectedAuthMethod = 'face';
                 if (running) return;
                 resultEl.classList.remove('show');
 
@@ -4160,12 +4346,18 @@ function executeCommand(action, fromVoice, commandData) {
 
             function openDashboard(fromVoice) {
                 if (dashboardOpen) return;
+                const method = fromVoice ? 'voice' : (window.selectedAuthMethod || 'manual');
                 dashboardOpen = true;
                 dashboardRoot.classList.remove('dashboard-locked');
                 voiceGate.classList.add('gate-hide');
                 voiceWidget.classList.add('widget-show');
-                // Jangan hapus voice gate; elemen ini dipakai lagi saat dashboard di-reset.
-                showToast('Dashboard Terbuka', fromVoice ? 'Dibuka melalui perintah suara.' : 'Dashboard telah dibuka.', 'success');
+
+                const detail = method === 'face'
+                    ? 'Dibuka melalui verifikasi Face ID.'
+                    : method === 'voice'
+                        ? 'Dibuka melalui perintah suara.'
+                        : 'Dashboard telah dibuka.';
+                showToast('Dashboard Terbuka', detail, 'success');
             }
 
             function closeDashboard() {
@@ -4194,8 +4386,11 @@ function executeCommand(action, fromVoice, commandData) {
                 }
                 document.body.style.overflow = '';
 
-                // Tampilkan kembali voice gate seperti kondisi pertama kali halaman dibuka.
+                // Tampilkan kembali pilihan metode seperti kondisi pertama kali halaman dibuka.
                 if (voiceGate) voiceGate.classList.remove('gate-hide');
+                if (window.authMethodSelector && typeof window.authMethodSelector.showChooser === 'function') {
+                    window.authMethodSelector.showChooser();
+                }
 
                 // Putar ulang opening dari awal. Setelah selesai, pengguna kembali berada
                 // di voice gate dan harus memberi perintah untuk membuka dashboard.
@@ -4316,6 +4511,7 @@ function executeCommand(action, fromVoice, commandData) {
             }
 
             function startListening() {
+                window.selectedAuthMethod = 'voice';
                 if (!SpeechRecognitionCtor) {
                     setGateStatus('Browser ini tidak mendukung pengenalan suara. Gunakan Chrome di desktop/Android.', false);
                     showToast('Tidak Didukung', 'Browser ini tidak mendukung Web Speech API. Coba gunakan Chrome.', 'error');
