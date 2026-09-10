@@ -4134,9 +4134,18 @@
                 if (type) statusEl.classList.add(type);
             }
 
+            // Referensi khusus Face ID. Tidak mengubah gambar yang tampil pada kartu anggota.
+            // Tambahkan nama anggota + Raw GitHub URL di object ini saat mengganti referensi wajah.
+            const FACE_ID_REFERENCES = {
+                "Agip Marcelo Sa'bi": 'https://raw.githubusercontent.com/agipmarcelosabi1-hash/Kamar-2-PHA/main/WhatsApp%20Image%202026-09-10%20at%2019.29.21.jpeg'
+            };
+
             function getMemberImages() {
-                return Array.from(document.querySelectorAll('.crew-card[data-name][data-img]'))
-                    .map(card => ({ name: card.dataset.name, image: card.dataset.img }))
+                return Array.from(document.querySelectorAll('.crew-card[data-name]'))
+                    .map(card => ({
+                        name: card.dataset.name,
+                        image: FACE_ID_REFERENCES[card.dataset.name] || card.dataset.img
+                    }))
                     .filter(item => item.name && item.image);
             }
 
