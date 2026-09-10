@@ -5840,6 +5840,11 @@ body.member-theme-tirzha .ambient-field::after {
                         setStatus('Wajah dikenali. Akses diberikan.', 'ok');
                         stopCamera(false);
 
+                        // Simpan identitas hasil Face ID sebelum sambutan.
+                        // openDashboard() memakai currentFaceMember untuk memilih tema anggota.
+                        window.selectedAuthMethod = 'face';
+                        window.currentFaceMember = best.label;
+
                         // Sambutan personal hanya untuk akses melalui Face ID.
                         showFaceWelcome(best.label);
                         return;
@@ -5856,6 +5861,7 @@ body.member-theme-tirzha .ambient-field::after {
 
             async function startFaceID() {
                 window.selectedAuthMethod = 'face';
+                window.currentFaceMember = null;
                 if (running) return;
                 resultEl.classList.remove('show');
 
