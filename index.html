@@ -2804,7 +2804,111 @@
                 animation: none !important;
             }
         }
-    </style>
+    
+        /* ============================================================
+           FACE ID / FACE RECOGNITION
+           ============================================================ */
+        .face-access {
+            margin: 0 auto 1.35rem;
+            width: min(100%, 720px);
+            padding: 1rem;
+            border: 1px solid rgba(43, 227, 209, 0.20);
+            border-radius: 20px;
+            background: rgba(3, 12, 19, 0.42);
+        }
+        .face-access-head {
+            display:flex; align-items:center; justify-content:space-between;
+            gap:.8rem; margin-bottom:.85rem;
+        }
+        .face-access-title {
+            display:flex; align-items:center; gap:.55rem;
+            color:var(--foam); font-family:'Space Grotesk',sans-serif;
+            font-weight:700; font-size:.95rem;
+        }
+        .face-access-badge {
+            display:inline-flex; align-items:center; gap:.35rem;
+            padding:.3rem .55rem; border-radius:999px;
+            color:var(--aqua); border:1px solid rgba(43,227,209,.25);
+            background:rgba(43,227,209,.07);
+            font:600 .64rem 'Space Mono',monospace; letter-spacing:.04em;
+        }
+        .face-camera {
+            position:relative; width:100%; aspect-ratio:16/9; min-height:230px;
+            overflow:hidden; border-radius:16px; background:#02080d;
+            border:1px solid var(--stroke-strong);
+        }
+        #face-video {
+            width:100%; height:100%; display:block; object-fit:cover;
+            transform:scaleX(-1); background:#02080d;
+        }
+        .face-camera::after {
+            content:""; position:absolute; inset:10%;
+            border:1px solid rgba(43,227,209,.35);
+            border-radius:42% 42% 46% 46%; pointer-events:none;
+            box-shadow:0 0 35px rgba(43,227,209,.08);
+        }
+        .face-scan-line {
+            position:absolute; left:12%; right:12%; top:16%; height:1px;
+            background:rgba(43,227,209,.75);
+            box-shadow:0 0 14px rgba(43,227,209,.65);
+            opacity:0; pointer-events:none;
+        }
+        .face-camera.scanning .face-scan-line {
+            opacity:1; animation:faceScan 2.2s ease-in-out infinite;
+        }
+        @keyframes faceScan {
+            0%,100%{transform:translateY(0)}
+            50%{transform:translateY(320px)}
+        }
+        .face-corner {
+            position:absolute; width:28px; height:28px;
+            border-color:var(--aqua); border-style:solid; opacity:.8;
+            pointer-events:none;
+        }
+        .face-corner.tl{top:12px;left:12px;border-width:2px 0 0 2px}
+        .face-corner.tr{top:12px;right:12px;border-width:2px 2px 0 0}
+        .face-corner.bl{bottom:12px;left:12px;border-width:0 0 2px 2px}
+        .face-corner.br{bottom:12px;right:12px;border-width:0 2px 2px 0}
+        .face-camera-placeholder {
+            position:absolute; inset:0; display:grid; place-items:center;
+            padding:1rem; text-align:center; color:var(--mist);
+            background:radial-gradient(circle at center,rgba(43,227,209,.06),rgba(3,12,19,.94));
+            pointer-events:none;
+        }
+        .face-camera-placeholder.hidden{display:none}
+        .face-camera-placeholder i{display:block;font-size:2.2rem;color:var(--aqua);margin-bottom:.55rem}
+        .face-camera-placeholder span{display:block;font:600 .68rem 'Space Mono',monospace;letter-spacing:.05em}
+        .face-status {
+            min-height:1.5em; margin:.8rem 0; color:var(--mist);
+            font:600 .7rem 'Space Mono',monospace; text-align:center;
+        }
+        .face-status.ok{color:var(--aqua)}
+        .face-status.error{color:var(--coral)}
+        .face-actions{display:flex;justify-content:center;gap:.65rem;flex-wrap:wrap}
+        .face-btn {
+            border:1px solid var(--stroke-strong); border-radius:999px;
+            padding:.7rem 1rem; cursor:pointer; color:var(--foam);
+            background:rgba(10,33,49,.8);
+            font:700 .72rem 'Space Mono',monospace;
+            transition:transform .18s ease,border-color .18s ease,background .18s ease;
+        }
+        .face-btn:hover{transform:translateY(-1px);border-color:rgba(43,227,209,.55)}
+        .face-btn.primary{color:#031116;background:var(--aqua);border-color:var(--aqua)}
+        .face-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+        .face-result {
+            display:none; align-items:center; justify-content:center; gap:.65rem;
+            margin-top:.8rem; padding:.65rem .8rem; border-radius:12px;
+            color:var(--aqua); background:rgba(43,227,209,.07);
+            border:1px solid rgba(43,227,209,.22);
+            font:700 .72rem 'Space Mono',monospace;
+        }
+        .face-result.show{display:flex}
+        @media(max-width:640px){
+            .face-camera{min-height:200px}
+            @keyframes faceScan{0%,100%{transform:translateY(0)}50%{transform:translateY(250px)}}
+        }
+
+</style>
 </head>
 
 <body class="antialiased pb-16">
@@ -2856,6 +2960,53 @@
     <!-- ===== VOICE ASSISTANT GATE (shown instead of dashboard until unlocked) ===== -->
     <div id="voice-gate" aria-label="Kontrol suara">
         <div class="panel voice-gate-card">
+
+            <!-- ===== FACE ID ACCESS ===== -->
+            <div class="face-access" id="face-access">
+                <div class="face-access-head">
+                    <div class="face-access-title">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <span>Face ID Access</span>
+                    </div>
+                    <div class="face-access-badge">
+                        <i class="fa-solid fa-camera"></i> LAPTOP WEBCAM
+                    </div>
+                </div>
+
+                <div class="face-camera" id="face-camera">
+                    <video id="face-video" autoplay muted playsinline></video>
+                    <div class="face-camera-placeholder" id="face-camera-placeholder">
+                        <div>
+                            <i class="fa-solid fa-camera"></i>
+                            <span>KAMERA BELUM DIAKTIFKAN</span>
+                        </div>
+                    </div>
+                    <div class="face-scan-line"></div>
+                    <span class="face-corner tl"></span>
+                    <span class="face-corner tr"></span>
+                    <span class="face-corner bl"></span>
+                    <span class="face-corner br"></span>
+                </div>
+
+                <div id="face-status" class="face-status">
+                    Tekan "Mulai Face ID" lalu izinkan akses kamera.
+                </div>
+
+                <div class="face-actions">
+                    <button id="face-start-btn" class="face-btn primary" type="button">
+                        <i class="fa-solid fa-face-smile"></i> Mulai Face ID
+                    </button>
+                    <button id="face-stop-btn" class="face-btn" type="button" disabled>
+                        <i class="fa-solid fa-stop"></i> Hentikan
+                    </button>
+                </div>
+
+                <div id="face-result" class="face-result">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span id="face-result-text">Wajah dikenali.</span>
+                </div>
+            </div>
+
             <div class="panel-eyebrow voice-gate-eyebrow" style="display:flex;">Asisten Suara</div>
             <h1 class="voice-gate-title">Dashboard Terkunci</h1>
             <p class="voice-gate-sub">Ucapkan perintah suara untuk membuka dashboard. Tekan mikrofon untuk mulai mendengarkan.</p>
@@ -2894,6 +3045,7 @@
 
             <div class="voice-command-list">
                 <div class="voice-command-row"><i class="fa-solid fa-quote-left"></i> <span>Ucapkan <span class="cmd">"buka dashboard"</span> untuk membuka konsol</span></div>
+                <div class="voice-command-row"><i class="fa-solid fa-face-smile"></i> <span>Atau gunakan <span class="cmd">Face ID</span> dengan webcam laptop</span></div>
                 <div class="voice-command-row"><i class="fa-solid fa-quote-left"></i> <span>Ucapkan <span class="cmd">"buka anggota kelompok"</span> untuk melihat data anggota</span></div>
             </div>
         </div>
@@ -3274,6 +3426,9 @@
         </div>
     </div>
 
+    <!-- ===== FACE RECOGNITION ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
     <!-- ===== FIREBASE SDK ===== -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -3535,6 +3690,263 @@
             document.addEventListener('keydown', e => {
                 if (e.key === 'Escape' && backdrop.classList.contains('open')) closeCrewModal();
             });
+        })();
+
+
+        // ================== FACE ID / FACE RECOGNITION ==================
+        (function initFaceRecognition() {
+            const video = document.getElementById('face-video');
+            const cameraBox = document.getElementById('face-camera');
+            const placeholder = document.getElementById('face-camera-placeholder');
+            const startBtn = document.getElementById('face-start-btn');
+            const stopBtn = document.getElementById('face-stop-btn');
+            const statusEl = document.getElementById('face-status');
+            const resultEl = document.getElementById('face-result');
+            const resultText = document.getElementById('face-result-text');
+            const voiceGate = document.getElementById('voice-gate');
+            const dashboardRoot = document.getElementById('dashboard-root');
+
+            const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
+            const MATCH_THRESHOLD = 0.52;
+            const CHECK_INTERVAL = 350;
+
+            let stream = null;
+            let timer = null;
+            let running = false;
+            let modelsReady = false;
+            let labeledDescriptors = null;
+            let loadingPromise = null;
+
+            function setStatus(text, type) {
+                if (!statusEl) return;
+                statusEl.innerText = text;
+                statusEl.classList.remove('ok', 'error');
+                if (type) statusEl.classList.add(type);
+            }
+
+            function getMemberImages() {
+                return Array.from(document.querySelectorAll('.crew-card[data-name][data-img]'))
+                    .map(card => ({ name: card.dataset.name, image: card.dataset.img }))
+                    .filter(item => item.name && item.image);
+            }
+
+            async function loadModels() {
+                if (modelsReady) return;
+                if (loadingPromise) return loadingPromise;
+                if (!window.faceapi) throw new Error('Library Face Recognition belum termuat.');
+
+                loadingPromise = Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+                ]).then(() => { modelsReady = true; })
+                  .finally(() => { loadingPromise = null; });
+
+                return loadingPromise;
+            }
+
+            async function buildLabeledDescriptors() {
+                if (labeledDescriptors) return labeledDescriptors;
+
+                const members = getMemberImages();
+                if (!members.length) throw new Error('Foto referensi anggota tidak ditemukan.');
+
+                const descriptors = [];
+
+                for (const member of members) {
+                    try {
+                        const image = await faceapi.fetchImage(member.image);
+                        const detection = await faceapi
+                            .detectSingleFace(image, new faceapi.TinyFaceDetectorOptions({
+                                inputSize: 320,
+                                scoreThreshold: 0.45
+                            }))
+                            .withFaceLandmarks()
+                            .withFaceDescriptor();
+
+                        if (detection) {
+                            descriptors.push(new faceapi.LabeledFaceDescriptors(
+                                member.name, [detection.descriptor]
+                            ));
+                        }
+                    } catch (error) {
+                        console.warn('Foto referensi gagal diproses:', member.name, error);
+                    }
+                }
+
+                if (!descriptors.length) {
+                    throw new Error('Tidak ada foto anggota yang berhasil diproses sebagai referensi wajah.');
+                }
+
+                labeledDescriptors = descriptors;
+                return labeledDescriptors;
+            }
+
+            async function prepareFaceRecognition() {
+                setStatus('Memuat model Face ID…');
+                await loadModels();
+                setStatus('Menyiapkan wajah anggota…');
+                await buildLabeledDescriptors();
+            }
+
+            async function startCamera() {
+                if (running) return;
+
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('Browser tidak mendukung akses kamera. Gunakan Chrome/Edge melalui HTTPS.');
+                }
+
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    },
+                    audio: false
+                });
+
+                video.srcObject = stream;
+                await video.play();
+
+                if (placeholder) placeholder.classList.add('hidden');
+                if (cameraBox) cameraBox.classList.add('scanning');
+                if (startBtn) startBtn.disabled = true;
+                if (stopBtn) stopBtn.disabled = false;
+                running = true;
+
+                setStatus('Kamera aktif. Posisikan wajah di tengah…');
+                clearTimeout(timer);
+                timer = setTimeout(scanFace, 500);
+            }
+
+            function stopCamera(resetStatus = true) {
+                running = false;
+                clearTimeout(timer);
+                timer = null;
+
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+
+                if (video) video.srcObject = null;
+                if (placeholder) placeholder.classList.remove('hidden');
+                if (cameraBox) cameraBox.classList.remove('scanning');
+                if (startBtn) startBtn.disabled = false;
+                if (stopBtn) stopBtn.disabled = true;
+
+                if (resetStatus) setStatus('Face ID dihentikan.');
+            }
+
+            async function scanFace() {
+                if (!running || !modelsReady || !labeledDescriptors) return;
+
+                try {
+                    const detection = await faceapi
+                        .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({
+                            inputSize: 320,
+                            scoreThreshold: 0.5
+                        }))
+                        .withFaceLandmarks()
+                        .withFaceDescriptor();
+
+                    if (!running) return;
+
+                    if (!detection) {
+                        setStatus('Mencari wajah… posisikan wajah di tengah kamera.');
+                        timer = setTimeout(scanFace, CHECK_INTERVAL);
+                        return;
+                    }
+
+                    const matcher = new faceapi.FaceMatcher(labeledDescriptors, MATCH_THRESHOLD);
+                    const best = matcher.findBestMatch(detection.descriptor);
+
+                    if (best.label !== 'unknown') {
+                        const distance = Number(best.distance || 0);
+                        resultText.innerText =
+                            best.label + ' • kecocokan ' +
+                            Math.max(0, (1 - distance) * 100).toFixed(0) + '%';
+
+                        resultEl.classList.add('show');
+                        setStatus('Wajah dikenali. Akses diberikan.', 'ok');
+                        stopCamera(false);
+
+                        setTimeout(() => {
+                            if (window.voiceAssistant &&
+                                typeof window.voiceAssistant.openDashboard === 'function') {
+                                window.voiceAssistant.openDashboard();
+                            } else if (dashboardRoot && voiceGate) {
+                                dashboardRoot.classList.remove('dashboard-locked');
+                                voiceGate.classList.add('gate-hide');
+                            }
+                        }, 650);
+                        return;
+                    }
+
+                    setStatus('Wajah belum cocok dengan anggota kelompok. Coba lagi.', 'error');
+                    timer = setTimeout(scanFace, CHECK_INTERVAL);
+                } catch (error) {
+                    console.error('Face ID scan error:', error);
+                    setStatus('Gagal membaca kamera/wajah. Coba ulangi.', 'error');
+                    timer = setTimeout(scanFace, 700);
+                }
+            }
+
+            async function startFaceID() {
+                if (running) return;
+                resultEl.classList.remove('show');
+
+                try {
+                    if (location.protocol !== 'https:' &&
+                        location.hostname !== 'localhost' &&
+                        location.hostname !== '127.0.0.1') {
+                        throw new Error('Face ID membutuhkan HTTPS. Buka melalui link Netlify.');
+                    }
+
+                    startBtn.disabled = true;
+                    setStatus('Mempersiapkan Face ID…');
+
+                    await prepareFaceRecognition();
+                    await startCamera();
+                } catch (error) {
+                    console.error('Face ID start error:', error);
+
+                    if (error.name === 'NotAllowedError' ||
+                        error.name === 'PermissionDeniedError') {
+                        setStatus('Akses kamera ditolak. Izinkan kamera di browser lalu coba lagi.', 'error');
+                    } else if (error.name === 'NotFoundError') {
+                        setStatus('Webcam tidak ditemukan di laptop ini.', 'error');
+                    } else {
+                        setStatus(error.message || 'Face ID gagal dimulai.', 'error');
+                    }
+
+                    if (startBtn) startBtn.disabled = false;
+                    stopCamera(false);
+                }
+            }
+
+            if (startBtn) startBtn.addEventListener('click', startFaceID);
+            if (stopBtn) stopBtn.addEventListener('click', () => stopCamera());
+
+            const observer = new MutationObserver(() => {
+                if (dashboardRoot &&
+                    dashboardRoot.classList.contains('dashboard-locked') &&
+                    running) {
+                    stopCamera();
+                }
+            });
+
+            if (dashboardRoot) {
+                observer.observe(dashboardRoot, {
+                    attributes: true,
+                    attributeFilter: ['class']
+                });
+            }
+
+            window.faceAccess = {
+                start: startFaceID,
+                stop: stopCamera
+            };
         })();
 
         // ================== VOICE ASSISTANT (perintah suara) ==================
