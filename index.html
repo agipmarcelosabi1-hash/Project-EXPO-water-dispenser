@@ -4716,6 +4716,126 @@ body.member-theme-tirzha .ambient-field::after {
 }
 </style>
 
+
+<style id="disable-botanical-overlays-v14">
+/* Remove previous botanical foliage overlays for the Agip anime theme. */
+body.member-theme-agip .panel::before,
+body.member-theme-agip .crew-card::before,
+body.member-theme-agip .turbidity-card::before,
+body.member-theme-agip .crew-card::after {
+  background: none !important;
+  content: none !important;
+  opacity: 0 !important;
+}
+
+/* Disable seasonal forest decoration layers only for Agip. */
+body.member-theme-agip .ambient-field,
+body.member-theme-agip .data-orbit,
+body.member-theme-agip .spring-foliage,
+body.member-theme-agip .autumn-foliage,
+body.member-theme-agip [class*="leaf"],
+body.member-theme-agip [class*="foliage"],
+body.member-theme-agip [class*="botanical"],
+body.member-theme-agip [class*="branch"] {
+  display: none !important;
+}
+
+/* Keep the dashboard silhouette unchanged, but make Agip's theme fully anime/browser-like. */
+body.member-theme-agip {
+  --member-bg-a: #75a9e8;
+  --member-bg-b: #b79be8;
+  --member-card: rgba(118, 154, 222, 0.92);
+  --member-card-strong: rgba(92, 126, 197, 0.95);
+  --member-border: rgba(228, 235, 255, 0.52);
+  --member-accent: #f5efff;
+  --member-accent-soft: #8b76d6;
+  --member-text: #fbfaff;
+  background:
+    radial-gradient(circle at 14% 20%, rgba(255,255,255,.10), transparent 24%),
+    radial-gradient(circle at 82% 18%, rgba(255,255,255,.08), transparent 20%),
+    linear-gradient(135deg, #6e9fe0 0%, #7e99df 42%, #aa8edb 100%) !important;
+  color: var(--member-text) !important;
+}
+
+body.member-theme-agip .panel,
+body.member-theme-agip .turbidity-card,
+body.member-theme-agip .crew-card,
+body.member-theme-agip .toast,
+body.member-theme-agip .crew-modal,
+body.member-theme-agip .assistant-chat,
+body.member-theme-agip .assistant-widget,
+body.member-theme-agip .conn-pill {
+  background: var(--member-card) !important;
+  border-color: var(--member-border) !important;
+  box-shadow: 0 10px 28px rgba(58, 70, 145, .16) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+body.member-theme-agip .turbidity-card,
+body.member-theme-agip .crew-card {
+  background: var(--member-card-strong) !important;
+}
+
+body.member-theme-agip .headline-grad {
+  background: linear-gradient(105deg, #ffffff 0%, #f4efff 52%, #e0d5ff 100%) !important;
+}
+
+body.member-theme-agip .brand-mark,
+body.member-theme-agip .pump-ring,
+body.member-theme-agip .turbidity-icon {
+  background: rgba(245,239,255,.16) !important;
+  border-color: rgba(245,239,255,.45) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+body.member-theme-agip .panel-eyebrow,
+body.member-theme-agip .crew-role,
+body.member-theme-agip .hud-item .k,
+body.member-theme-agip .crew-nim,
+body.member-theme-agip .turbidity-unit,
+body.member-theme-agip .turbidity-footer {
+  color: rgba(250,248,255,.82) !important;
+}
+
+body.member-theme-agip .panel-eyebrow::before,
+body.member-theme-agip .crew-role,
+body.member-theme-agip .turbidity-footer i {
+  color: #f5efff !important;
+}
+
+body.member-theme-agip .cup-inner {
+  background: rgba(60, 84, 147, .58) !important;
+}
+
+body.member-theme-agip .cup-water {
+  background: linear-gradient(180deg, #8fd8ff 0%, #6f93ea 100%) !important;
+}
+
+body.member-theme-agip .topbar {
+  background: rgba(76, 113, 181, .78) !important;
+  border-bottom-color: rgba(235,240,255,.30) !important;
+}
+
+body.member-theme-agip #toast-container .toast {
+  background: rgba(81, 108, 171, .94) !important;
+}
+
+body.member-theme-agip .assistant-chat,
+body.member-theme-agip .assistant-widget {
+  background: rgba(92, 122, 194, .95) !important;
+}
+
+/* Explicitly hide botanical pseudo/decorative nodes even when the old theme used !important. */
+body.member-theme-agip .crew-card::before,
+body.member-theme-agip .crew-card::after,
+body.member-theme-agip .panel::before,
+body.member-theme-agip .turbidity-card::before {
+  display: none !important;
+}
+</style>
+
 </head>
 
 <body class="antialiased pb-16">
