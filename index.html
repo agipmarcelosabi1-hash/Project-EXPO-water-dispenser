@@ -1,0 +1,4302 @@
+<!DOCTYPE html>
+<html lang="id" style="background:#020a12;">
+<head>
+    <!-- 3D visual effects disabled: 2D UI, glare, opening, sparkline, and Firebase behavior retained. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelompok 3 — Water Dispenser Console</title>
+    <!--
+      VERSI VS CODE — SEMUA FITUR DALAM SATU FILE index.html
+      Jalankan dengan Live Server / localhost atau hosting HTTPS agar
+      Web Speech API (mikrofon) dapat meminta izin browser dengan benar.
+    -->
+
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================================
+           CSS VARIABLES & RESET
+           ============================================================ */
+        :root {
+            --abyss: #030c13;
+            --depth: #071c2b;
+            --surface: rgba(10, 33, 49, 0.66);
+            --surface-2: rgba(14, 45, 66, 0.88);
+            --stroke: rgba(140, 205, 222, 0.14);
+            --stroke-strong: rgba(140, 205, 222, 0.34);
+            --foam: #eaf7f8;
+            --mist: #7fa7b6;
+            --aqua: #2be3d1;
+            --aqua-dim: rgba(43, 227, 209, 0.14);
+            --violet: #8f86ff;
+            --amber: #ffb454;
+            --coral: #ff6e63;
+            --kelp: #6fe6a3;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        ::selection {
+            background: var(--aqua);
+            color: var(--abyss);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--foam);
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(43, 227, 209, 0.10), transparent 28%),
+                radial-gradient(circle at 85% 30%, rgba(143, 134, 255, 0.08), transparent 30%),
+                radial-gradient(circle at 50% 100%, rgba(43, 227, 209, 0.07), transparent 35%),
+                linear-gradient(135deg, #020910 0%, #031521 45%, #020a12 100%);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ============================================================
+           FUTURISTIC OCEAN / IoT BACKGROUND
+           ============================================================ */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -5;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(43, 227, 209, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(43, 227, 209, 0.035) 1px, transparent 1px);
+            background-size: 55px 55px;
+            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.35));
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.35));
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: -20%;
+            z-index: -4;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 25%, rgba(43, 227, 209, 0.13), transparent 20%),
+                radial-gradient(circle at 80% 20%, rgba(143, 134, 255, 0.10), transparent 18%),
+                radial-gradient(circle at 50% 80%, rgba(43, 227, 209, 0.08), transparent 25%);
+            filter: blur(20px);
+            animation: oceanGlow 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes oceanGlow {
+            0% {
+                transform: scale(1);
+                opacity: 0.65;
+            }
+            50% {
+                transform: scale(1.08) translate3d(-1%, 1%, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.03) translate3d(1%, -1%, 0);
+                opacity: 0.75;
+            }
+        }
+
+        /* IoT Particles */
+        .iot-particles {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .iot-particle {
+            position: absolute;
+            top: 0;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--aqua);
+            box-shadow: 0 0 6px var(--aqua), 0 0 14px rgba(43, 227, 209, 0.45);
+            opacity: 0.35;
+            animation:
+                particleFloat var(--duration) ease-in-out infinite,
+                particlePulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translate3d(0, 110vh, 0);
+            }
+            50% {
+                transform: translate3d(var(--drift), 50vh, 0);
+            }
+            100% {
+                transform: translate3d(calc(var(--drift) * -0.5), -10vh, 0);
+            }
+        }
+
+        @keyframes particlePulse {
+            from {
+                opacity: 0.15;
+            }
+            to {
+                opacity: 0.7;
+            }
+        }
+
+        /* Sonar Background */
+        .sonar-background {
+            position: fixed;
+            width: 420px;
+            height: 420px;
+            left: -150px;
+            bottom: -120px;
+            border-radius: 50%;
+            border: 1px solid rgba(43, 227, 209, 0.08);
+            z-index: -3;
+            pointer-events: none;
+            box-shadow:
+                0 0 80px rgba(43, 227, 209, 0.04),
+                inset 0 0 80px rgba(43, 227, 209, 0.03);
+            animation: sonarRotate 18s linear infinite;
+        }
+
+        .sonar-background::before,
+        .sonar-background::after {
+            content: "";
+            position: absolute;
+            inset: 45px;
+            border-radius: 50%;
+            border: 1px solid rgba(43, 227, 209, 0.06);
+        }
+
+        .sonar-background::after {
+            inset: 100px;
+        }
+
+        @keyframes sonarRotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============================================================
+           TYPOGRAPHY
+           ============================================================ */
+        .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.01em;
+        }
+
+        .font-mono {
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* ============================================================
+           PANEL & COMPONENT STYLES
+           ============================================================ */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--stroke);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 16px 40px -24px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        .panel-eyebrow {
+            font-size: 0.68rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--mist);
+            font-weight: 600;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .panel-eyebrow::before {
+            content: '// ';
+            color: var(--aqua);
+            opacity: 0.7;
+        }
+
+        .hairline {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--stroke-strong), transparent);
+        }
+
+        /* Topbar */
+        .topbar {
+            background: rgba(3, 12, 19, 0.72);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--stroke);
+        }
+
+        .brand-mark {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: radial-gradient(circle at 30% 30%, rgba(43, 227, 209, 0.4), rgba(43, 227, 209, 0.04));
+            border: 1px solid var(--stroke-strong);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--aqua);
+            box-shadow: 0 0 16px rgba(43, 227, 209, 0.25), inset 0 0 10px rgba(43, 227, 209, 0.12);
+            animation: brandBreathe 4s ease-in-out infinite;
+        }
+
+        @keyframes brandBreathe {
+            0%, 100% {
+                box-shadow: 0 0 16px rgba(43, 227, 209, 0.25), inset 0 0 10px rgba(43, 227, 209, 0.12);
+            }
+            50% {
+                box-shadow: 0 0 24px rgba(43, 227, 209, 0.4), inset 0 0 14px rgba(43, 227, 209, 0.2);
+            }
+        }
+
+        .conn-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            background: var(--surface-2);
+            border: 1px solid var(--stroke);
+            border-radius: 999px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .conn-pill:hover {
+            border-color: var(--stroke-strong);
+        }
+
+        .dot-wrap {
+            position: relative;
+            width: 9px;
+            height: 9px;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dot-ring {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 1px solid currentColor;
+            opacity: 0;
+        }
+
+        .dot.pulse~.dot-ring {
+            animation: ringPulse 2s ease-out infinite;
+        }
+
+        @keyframes ringPulse {
+            0% {
+                transform: scale(0.4);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(2.2);
+                opacity: 0;
+            }
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.32rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            border: 1px solid transparent;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .badge-neutral {
+            background: rgba(127, 167, 182, 0.12);
+            color: var(--mist);
+            border-color: var(--stroke);
+        }
+
+        .badge-aqua {
+            background: rgba(43, 227, 209, 0.14);
+            color: var(--aqua);
+            border-color: rgba(43, 227, 209, 0.4);
+            box-shadow: 0 0 10px rgba(43, 227, 209, 0.15);
+        }
+
+        .badge-amber {
+            background: rgba(255, 180, 84, 0.14);
+            color: var(--amber);
+            border-color: rgba(255, 180, 84, 0.4);
+        }
+
+        .badge-coral {
+            background: rgba(255, 110, 99, 0.14);
+            color: var(--coral);
+            border-color: rgba(255, 110, 99, 0.4);
+            box-shadow: 0 0 10px rgba(255, 110, 99, 0.15);
+        }
+
+        .badge-kelp {
+            background: rgba(111, 230, 163, 0.14);
+            color: var(--kelp);
+            border-color: rgba(111, 230, 163, 0.4);
+            box-shadow: 0 0 10px rgba(111, 230, 163, 0.15);
+        }
+
+        /* HUD Strip */
+        .hud-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.4rem;
+        }
+
+        .hud-item {
+            font-family: 'Space Mono', monospace;
+        }
+
+        .hud-item .k {
+            font-size: 0.62rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--mist);
+        }
+
+        .hud-item .v {
+            font-size: 0.92rem;
+            color: var(--foam);
+            margin-top: 0.15rem;
+        }
+
+        /* ============================================================
+           POUR RIG / DISPENSER VISUALIZATION
+           ============================================================ */
+        .pour-rig {
+            position: relative;
+            width: 184px;
+            height: 250px;
+            margin: 0 auto;
+        }
+
+        .sonar-ring {
+            position: absolute;
+            left: 50%;
+            bottom: 6px;
+            transform: translate(-50%, 20%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 1.5px solid var(--aqua);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .pour-rig.pouring .sonar-ring {
+            animation: sonarPing 2s ease-out infinite;
+        }
+
+        .pour-rig.pouring .sonar-ring.r2 {
+            animation-delay: 0.6s;
+        }
+
+        .pour-rig.pouring .sonar-ring.r3 {
+            animation-delay: 1.2s;
+        }
+
+        @keyframes sonarPing {
+            0% {
+                width: 60px;
+                height: 60px;
+                opacity: 0.5;
+            }
+            100% {
+                width: 200px;
+                height: 200px;
+                opacity: 0;
+            }
+        }
+
+        .spout {
+            position: absolute;
+            top: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            width: 48px;
+            height: 19px;
+            border-radius: 0 0 11px 11px;
+            background: linear-gradient(180deg, var(--surface-2), rgba(7, 28, 43, 0.95));
+            border: 1px solid var(--stroke-strong);
+            border-top: none;
+        }
+
+        .drop {
+            position: absolute;
+            top: 23px;
+            left: 50%;
+            width: 5px;
+            height: 10px;
+            margin-left: -2.5px;
+            background: var(--aqua);
+            opacity: 0;
+            box-shadow: 0 0 8px var(--aqua);
+            border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+            z-index: 2;
+        }
+
+        .pour-rig.pouring .drop {
+            animation: dropFall 0.9s linear infinite;
+        }
+
+        .pour-rig.pouring .drop.d2 {
+            animation-delay: 0.3s;
+        }
+
+        .pour-rig.pouring .drop.d3 {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes dropFall {
+            0% {
+                top: 23px;
+                opacity: 0;
+            }
+            15% {
+                opacity: 1;
+            }
+            85% {
+                top: 160px;
+                opacity: 1;
+            }
+            100% {
+                top: 165px;
+                opacity: 0;
+            }
+        }
+
+        .cup-glow {
+            position: absolute;
+            left: 50%;
+            bottom: 10px;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(43, 227, 209, 0.25), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .pour-rig.ready .cup-glow {
+            opacity: 1;
+        }
+
+        .cup-wrap {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 162px;
+            height: 208px;
+            z-index: 1;
+            transform-origin: 50% 90%;
+        }
+
+        .cup-border {
+            position: absolute;
+            inset: 0;
+            clip-path: polygon(17% 3%, 83% 3%, 70% 97%, 30% 97%);
+            background: linear-gradient(155deg, rgba(234, 247, 248, 0.4), rgba(234, 247, 248, 0.05));
+        }
+
+        .cup-inner {
+            position: absolute;
+            inset: 3px;
+            clip-path: polygon(18.2% 4.2%, 81.8% 4.2%, 69.3% 94.5%, 30.7% 94.5%);
+            background: rgba(3, 12, 19, 0.65);
+            overflow: hidden;
+        }
+
+        .cup-water {
+            position: absolute;
+            bottom: 0;
+            left: -15%;
+            width: 130%;
+            height: 6%;
+            background: linear-gradient(180deg, var(--aqua) 0%, #0d8f83 100%);
+            transition: height 1.2s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .cup-water.murky {
+            background: linear-gradient(180deg, #e0ab63 0%, #7a5a26 100%);
+        }
+
+        .cup-water::before {
+            content: '';
+            position: absolute;
+            top: -7px;
+            left: 0;
+            width: 200%;
+            height: 12px;
+            background-image: radial-gradient(ellipse 18px 6px at 15px 6px, rgba(255, 255, 255, 0.5), transparent 70%);
+            background-size: 40px 12px;
+            background-repeat: repeat-x;
+            animation: waveScroll 4s linear infinite;
+        }
+
+        @keyframes waveScroll {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(-40px);
+            }
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: 2px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(234, 247, 248, 0.5);
+            opacity: 0;
+        }
+
+        .pour-rig.pouring .bubble {
+            animation: bubbleRise 1.8s ease-in infinite;
+        }
+
+        .bubble.b1 {
+            left: 38%;
+            animation-delay: 0.1s;
+        }
+
+        .bubble.b2 {
+            left: 55%;
+            animation-delay: 0.7s;
+        }
+
+        .bubble.b3 {
+            left: 47%;
+            animation-delay: 1.2s;
+        }
+
+        @keyframes bubbleRise {
+            0% {
+                bottom: 4px;
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                bottom: 80%;
+                opacity: 0;
+            }
+        }
+
+        .cup-caption {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--mist);
+            margin-top: 0.8rem;
+        }
+
+        .pour-tank-shadow {
+            position: absolute;
+            left: 50%;
+            bottom: -6px;
+            width: 100px;
+            height: 12px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(0, 0, 0, 0.4), transparent 70%);
+            transform: translateX(-50%);
+            animation: shadowBreathe 7s ease-in-out infinite;
+        }
+
+        @keyframes shadowBreathe {
+            0%, 100% {
+                opacity: 0.4;
+                transform: translateX(-50%) scaleX(1);
+            }
+            50% {
+                opacity: 0.25;
+                transform: translateX(-50%) scaleX(0.85);
+            }
+        }
+
+        .idle-ping {
+            position: absolute;
+            left: 50%;
+            bottom: 6px;
+            transform: translate(-50%, 20%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid rgba(43, 227, 209, 0.2);
+            opacity: 0;
+            pointer-events: none;
+            animation: idlePing 5s ease-out infinite;
+        }
+
+        @keyframes idlePing {
+            0% {
+                width: 30px;
+                height: 30px;
+                opacity: 0.3;
+            }
+            100% {
+                width: 140px;
+                height: 140px;
+                opacity: 0;
+            }
+        }
+
+        .pour-rig.pouring .idle-ping {
+            display: none;
+        }
+
+        /* ============================================================
+           GAUGE
+           ============================================================ */
+        .gauge-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 220px;
+            margin: 0 auto;
+            transform-origin: 50% 100%;
+        }
+
+        .gauge-value {
+            position: absolute;
+            left: 50%;
+            bottom: 2px;
+            transform: translateX(-50%);
+            text-align: center;
+            width: 100%;
+        }
+
+        .gauge-track {
+            fill: none;
+            stroke: rgba(140, 205, 222, 0.12);
+            stroke-width: 13;
+            stroke-linecap: round;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke-width: 13;
+            stroke-linecap: round;
+            stroke: var(--aqua);
+            filter: drop-shadow(0 0 4px rgba(43, 227, 209, 0.4));
+            stroke-dasharray: 263;
+            stroke-dashoffset: 263;
+            transition: stroke-dashoffset 0.8s cubic-bezier(.4, 0, .2, 1), stroke 0.4s ease;
+        }
+
+        .gauge-tick {
+            fill: var(--mist);
+        }
+
+        .gauge-tick-minor {
+            fill: rgba(127, 167, 182, 0.35);
+        }
+
+        /* ============================================================
+           PUMP RING
+           ============================================================ */
+        .pump-ring {
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--stroke-strong);
+            color: var(--mist);
+            background: rgba(127, 167, 182, 0.06);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .pump-ring.on {
+            border-color: rgba(111, 230, 163, 0.6);
+            color: var(--kelp);
+            background: rgba(111, 230, 163, 0.12);
+            box-shadow: 0 0 16px rgba(111, 230, 163, 0.35);
+        }
+
+        .pump-ring .fa-power-off {
+            transition: transform 0.3s ease;
+        }
+
+        .pump-ring.on .fa-power-off {
+            transform: scale(1.1);
+        }
+
+        .pump-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1.5px dashed rgba(111, 230, 163, 0);
+            transition: border-color 0.3s ease;
+        }
+
+        .pump-ring.on::before {
+            border-color: rgba(111, 230, 163, 0.4);
+            animation: spinSlow 5s linear infinite;
+        }
+
+        @keyframes spinSlow {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============================================================
+           LIFT / INTERACTION EFFECTS
+           ============================================================ */
+        .lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lift:hover {
+            transform: translateY(-3px);
+            border-color: var(--stroke-strong);
+            box-shadow: 0 16px 40px -20px rgba(0, 0, 0, 0.7);
+        }
+
+        .lift::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -60%;
+            width: 40%;
+            background: linear-gradient(115deg, transparent, rgba(234, 247, 248, 0.05), transparent);
+            transform: skewX(-18deg);
+            transition: left 0.6s ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .lift:hover::before {
+            left: 130%;
+        }
+
+        .lift>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .bracket {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--aqua);
+            opacity: 0.5;
+        }
+
+        .bracket.tl {
+            top: -1px;
+            left: -1px;
+            border-right: none;
+            border-bottom: none;
+            border-top-left-radius: 8px;
+        }
+
+        .bracket.br {
+            bottom: -1px;
+            right: -1px;
+            border-left: none;
+            border-top: none;
+            border-bottom-right-radius: 8px;
+        }
+
+        /* ============================================================
+           TOAST NOTIFICATIONS
+           ============================================================ */
+        .toast {
+            background: var(--surface);
+            border: 1px solid var(--stroke);
+            border-radius: 14px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 16px 40px -20px rgba(0, 0, 0, 0.7);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.5s cubic-bezier(.34, 1.56, .64, 1), opacity 0.3s ease;
+        }
+
+        .toast-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+        }
+
+        /* ============================================================
+           TEXT EFFECTS
+           ============================================================ */
+        .headline-grad {
+            background: linear-gradient(105deg, var(--foam) 20%, var(--aqua) 45%, var(--violet) 70%, var(--aqua) 95%);
+            background-size: 220% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradFlow 8s ease-in-out infinite;
+        }
+
+        @keyframes gradFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .flash {
+            animation: numFlash 0.6s ease-out;
+        }
+
+        @keyframes numFlash {
+            0% {
+                text-shadow: 0 0 0 rgba(43, 227, 209, 0);
+            }
+            30% {
+                text-shadow: 0 0 12px rgba(43, 227, 209, 0.7);
+            }
+            100% {
+                text-shadow: 0 0 0 rgba(43, 227, 209, 0);
+            }
+        }
+
+        /* Header scan effect */
+        header.panel {
+            overflow: hidden;
+        }
+
+        header.panel::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 80px;
+            top: -120px;
+            background: linear-gradient(180deg, transparent, rgba(43, 227, 209, 0.06), transparent);
+            animation: scanSweep 7s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scanSweep {
+            0% {
+                top: -120px;
+            }
+            60%, 100% {
+                top: 110%;
+            }
+        }
+
+        /* ============================================================
+           CREW CARDS & MODAL
+           ============================================================ */
+        .crew-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .crew-card {
+            background: rgba(14, 45, 66, 0.45);
+            border: 1px solid var(--stroke);
+            border-radius: 16px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .crew-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--aqua), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
+        }
+
+        .crew-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -60%;
+            width: 40%;
+            background: linear-gradient(115deg, transparent, rgba(234, 247, 248, 0.04), transparent);
+            transform: skewX(-18deg);
+            transition: left 0.6s ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .crew-card:hover::before {
+            opacity: 0.8;
+        }
+
+        .crew-card:hover::after {
+            left: 130%;
+        }
+
+        .crew-card:hover {
+            border-color: var(--stroke-strong);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px -16px rgba(0, 0, 0, 0.6);
+            background: rgba(14, 45, 66, 0.6);
+        }
+
+        .crew-card:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .crew-card:focus-visible {
+            outline: 2px solid var(--aqua);
+            outline-offset: 3px;
+        }
+
+        .crew-card>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .crew-avatar {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            margin: 0 auto 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 2px solid var(--stroke-strong);
+            box-shadow: 0 0 16px rgba(43, 227, 209, 0.15);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            background-color: rgba(14, 45, 66, 0.6);
+        }
+
+        .crew-avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .crew-card:hover .crew-avatar {
+            box-shadow: 0 0 24px rgba(43, 227, 209, 0.3);
+            transform: scale(1.04);
+        }
+
+        .crew-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--foam);
+            margin-bottom: 0.3rem;
+        }
+
+        .crew-role {
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--aqua);
+            font-family: 'Space Mono', monospace;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .crew-nim {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--mist);
+            opacity: 0.85;
+        }
+
+        .crew-badge {
+            display: inline-block;
+            margin-top: 0.6rem;
+            font-size: 0.6rem;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            background: rgba(43, 227, 209, 0.08);
+            border: 1px solid rgba(43, 227, 209, 0.25);
+            color: var(--aqua);
+        }
+
+        .crew-tap-hint {
+            position: absolute;
+            top: 0.7rem;
+            right: 0.8rem;
+            font-size: 0.6rem;
+            color: var(--mist);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .crew-card:hover .crew-tap-hint {
+            opacity: 0.65;
+        }
+
+        /* Crew Modal */
+        .crew-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(3, 9, 15, 0.72);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .crew-modal-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .crew-modal {
+            position: relative;
+            width: 100%;
+            max-width: 760px;
+            max-height: 88vh;
+            overflow: hidden;
+            border-radius: 24px;
+            background: var(--surface-2);
+            border: 1px solid var(--stroke-strong);
+            box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.85);
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            transform: translateY(24px) scale(0.96);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(.16, 1, .3, 1), opacity 0.35s ease;
+        }
+
+        .crew-modal-backdrop.open .crew-modal {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        .crew-modal-portrait {
+            position: relative;
+            background: linear-gradient(180deg, var(--depth), var(--abyss));
+            overflow: hidden;
+            min-height: 340px;
+        }
+
+        .crew-modal-portrait-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            filter: saturate(1.05) contrast(1.02);
+        }
+
+        .crew-modal-portrait::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(3, 12, 19, 0) 0%, rgba(3, 12, 19, 0.05) 55%, rgba(3, 12, 19, 0.75) 100%);
+            pointer-events: none;
+        }
+
+        .crew-modal-scanlines {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.5;
+            background: repeating-linear-gradient(180deg, rgba(43, 227, 209, 0.05) 0px, rgba(43, 227, 209, 0.05) 1px, transparent 1px, transparent 3px);
+            mix-blend-mode: overlay;
+        }
+
+        .crew-modal-scanbeam {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 90px;
+            top: -100px;
+            background: linear-gradient(180deg, transparent, rgba(43, 227, 209, 0.22), transparent);
+            animation: crewScan 3.4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes crewScan {
+            0% {
+                top: -100px;
+            }
+            100% {
+                top: 110%;
+            }
+        }
+
+        .crew-modal-frame-tag {
+            position: absolute;
+            left: 1rem;
+            top: 1rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--aqua);
+            background: rgba(3, 12, 19, 0.55);
+            border: 1px solid rgba(43, 227, 209, 0.3);
+            padding: 0.25rem 0.55rem;
+            border-radius: 999px;
+        }
+
+        .crew-modal-body {
+            padding: 1.9rem 1.8rem;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .crew-modal-close {
+            position: absolute;
+            top: 0.9rem;
+            right: 0.9rem;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(3, 12, 19, 0.55);
+            border: 1px solid var(--stroke-strong);
+            color: var(--foam);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            z-index: 3;
+        }
+
+        .crew-modal-close:hover {
+            background: rgba(255, 110, 99, 0.2);
+            border-color: rgba(255, 110, 99, 0.5);
+            color: var(--coral);
+            transform: rotate(90deg);
+        }
+
+        .crew-modal-role {
+            display: inline-flex;
+            align-self: flex-start;
+        }
+
+        .crew-modal-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--foam);
+            margin: 0.55rem 0 0.2rem;
+            line-height: 1.15;
+        }
+
+        .crew-modal-badge-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.7rem 0 1.1rem;
+        }
+
+        .crew-modal-hairline {
+            height: 1px;
+            background: linear-gradient(90deg, var(--stroke-strong), transparent);
+            margin-bottom: 1.1rem;
+        }
+
+        .crew-modal-field {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .crew-modal-field i {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            background: rgba(43, 227, 209, 0.1);
+            border: 1px solid rgba(43, 227, 209, 0.25);
+            color: var(--aqua);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .crew-modal-field .lbl {
+            font-size: 0.62rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--mist);
+            font-family: 'Space Mono', monospace;
+        }
+
+        .crew-modal-field .val {
+            font-size: 0.92rem;
+            color: var(--foam);
+            margin-top: 0.1rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .crew-modal-desc {
+            font-size: 0.87rem;
+            line-height: 1.6;
+            color: var(--mist);
+            margin-top: 0.3rem;
+        }
+
+        .crew-modal-footer-tag {
+            margin-top: auto;
+            padding-top: 1.1rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--mist);
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* ============================================================
+           BOOT SCREEN
+           ============================================================ */
+        html.booting,
+        html.booting body {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        #boot-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.6rem;
+            background: var(--abyss);
+            transition: opacity 0.7s ease, visibility 0.7s ease;
+        }
+
+        #boot-screen.boot-hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .boot-glow {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 45% at 50% 42%, rgba(43, 227, 209, 0.12), transparent 65%);
+            pointer-events: none;
+        }
+
+        .boot-emblem {
+            position: relative;
+            width: 108px;
+            height: 108px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .boot-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1.5px solid rgba(43, 227, 209, 0.35);
+            opacity: 0;
+            animation: bootRingPulse 2.4s ease-out infinite;
+        }
+
+        .boot-ring.r2 {
+            animation-delay: 0.8s;
+        }
+
+        .boot-ring.r3 {
+            animation-delay: 1.6s;
+        }
+
+        @keyframes bootRingPulse {
+            0% {
+                transform: scale(0.55);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(1.9);
+                opacity: 0;
+            }
+        }
+
+        .boot-core {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: radial-gradient(circle at 30% 30%, rgba(43, 227, 209, 0.45), rgba(43, 227, 209, 0.05));
+            border: 1px solid var(--stroke-strong);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--aqua);
+            font-size: 1.4rem;
+            box-shadow: 0 0 26px rgba(43, 227, 209, 0.35), inset 0 0 14px rgba(43, 227, 209, 0.18);
+            animation: brandBreathe 2.4s ease-in-out infinite;
+        }
+
+        .boot-wordmark {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 0.06em;
+            color: var(--foam);
+            text-align: center;
+        }
+
+        .boot-wordmark span {
+            color: var(--aqua);
+        }
+
+        .boot-progress-track {
+            width: 230px;
+            height: 3px;
+            border-radius: 2px;
+            background: rgba(140, 205, 222, 0.14);
+            overflow: hidden;
+        }
+
+        .boot-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--aqua), var(--violet));
+            box-shadow: 0 0 10px rgba(43, 227, 209, 0.6);
+            transition: width 0.35s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .boot-log {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--mist);
+            width: 260px;
+            min-height: 5.4em;
+            text-align: left;
+        }
+
+        .boot-log div {
+            opacity: 0;
+            transform: translateY(4px);
+            animation: bootLogIn 0.35s ease forwards;
+            margin-bottom: 0.25rem;
+        }
+
+        .boot-log div.ok {
+            color: var(--kelp);
+        }
+
+        @keyframes bootLogIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================================
+           ENTRANCE ANIMATION
+           ============================================================ */
+        .enter {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s cubic-bezier(.16, 1, .3, 1), transform 0.7s cubic-bezier(.16, 1, .3, 1);
+        }
+
+        body.dashboard-ready .enter {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============================================================
+           TURBIDITY CARD
+           ============================================================ */
+        .turbidity-card {
+            border-radius: 16px !important;
+            min-height: 190px;
+            width: 100%;
+            grid-column: 1 / -1;
+            background: linear-gradient(145deg, rgba(8, 28, 42, 0.94), rgba(4, 17, 27, 0.96)) !important;
+            border: 1px solid rgba(43, 227, 209, 0.16) !important;
+            box-shadow: 0 10px 26px -18px rgba(0, 0, 0, 0.8) !important;
+            overflow: hidden;
+        }
+
+        .turbidity-card:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 14px 30px -20px rgba(0, 0, 0, 0.85), 0 0 18px rgba(43, 227, 209, 0.06) !important;
+        }
+
+        .turbidity-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .turbidity-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--foam);
+        }
+
+        .turbidity-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--aqua);
+            background: rgba(43, 227, 209, 0.08);
+            border: 1px solid rgba(43, 227, 209, 0.18);
+        }
+
+        .turbidity-readout {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .turbidity-number {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(2.3rem, 5vw, 3.2rem);
+            line-height: 1;
+            font-weight: 700;
+            color: var(--foam);
+            letter-spacing: -0.04em;
+        }
+
+        .turbidity-unit {
+            margin-top: 0.35rem;
+            color: var(--mist);
+            font: 600 0.62rem 'Space Mono', monospace;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .turbidity-meter {
+            position: relative;
+            height: 9px;
+            margin-top: 1rem;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(140, 205, 222, 0.08);
+            border: 1px solid rgba(140, 205, 222, 0.09);
+        }
+
+        .turbidity-meter-fill {
+            width: 0%;
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--aqua), #56f0dc);
+            transition: width 0.45s ease, background 0.25s ease;
+        }
+
+        .turbidity-threshold {
+            position: absolute;
+            top: -3px;
+            bottom: -3px;
+            width: 2px;
+            background: var(--amber);
+            box-shadow: 0 0 6px rgba(255, 180, 84, 0.35);
+        }
+
+        .turbidity-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.45rem;
+            color: #698d9b;
+            font: 500 0.55rem 'Space Mono', monospace;
+        }
+
+        .turbidity-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 0.9rem;
+            padding-top: 0.85rem;
+            border-top: 1px solid rgba(140, 205, 222, 0.08);
+            color: var(--mist);
+            font: 500 0.58rem 'Space Mono', monospace;
+            letter-spacing: 0.04em;
+        }
+
+        .turbidity-footer i {
+            color: var(--aqua);
+            margin-right: 0.3rem;
+        }
+
+        /* ============================================================
+           SYSTEM OPENING
+           ============================================================ */
+        #systemOpening {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(43, 227, 209, 0.10), transparent 18%),
+                radial-gradient(circle at 50% 50%, rgba(143, 134, 255, 0.06), transparent 34%),
+                #02070d;
+            color: #eaf7f8;
+            transition: opacity 0.65s ease, visibility 0.65s ease;
+        }
+
+        #systemOpening.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none !important;
+            z-index: -1 !important;
+        }
+
+        .opening-grid {
+            position: absolute;
+            inset: 0;
+            opacity: 0.24;
+            background-image:
+                linear-gradient(rgba(43, 227, 209, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(43, 227, 209, 0.035) 1px, transparent 1px);
+            background-size: 56px 56px;
+        }
+
+        .opening-vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, transparent 20%, rgba(0, 0, 0, 0.48) 100%);
+        }
+
+        .opening-stage {
+            position: relative;
+            width: min(560px, 88vw);
+            height: min(560px, 88vw);
+            display: grid;
+            place-items: center;
+        }
+
+        .opening-core {
+            position: absolute;
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            border: 1px solid rgba(43, 227, 209, 0.65);
+            box-shadow: 0 0 18px rgba(43, 227, 209, 0.32), inset 0 0 18px rgba(43, 227, 209, 0.16);
+            animation: openingCore 1.8s ease-out forwards;
+        }
+
+        .opening-core::before {
+            content: "";
+            position: absolute;
+            inset: 22px;
+            border-radius: 50%;
+            background: #2be3d1;
+            box-shadow: 0 0 18px rgba(43, 227, 209, 0.9);
+        }
+
+        .opening-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(43, 227, 209, 0.28);
+            opacity: 0;
+            transform: scale(0.45);
+        }
+
+        .opening-ring.r1 {
+            width: 170px;
+            height: 170px;
+            animation: openingRing 1.6s 0.35s ease-out forwards;
+        }
+
+        .opening-ring.r2 {
+            width: 300px;
+            height: 300px;
+            border-color: rgba(143, 134, 255, 0.23);
+            animation: openingRing 1.8s 0.55s ease-out forwards;
+        }
+
+        .opening-ring.r3 {
+            width: 440px;
+            height: 440px;
+            border-color: rgba(43, 227, 209, 0.16);
+            animation: openingRing 2s 0.75s ease-out forwards;
+        }
+
+        .opening-ring::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: -4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2be3d1;
+            box-shadow: 0 0 12px rgba(43, 227, 209, 0.9);
+            transform: translateX(-50%);
+        }
+
+        .opening-sweep {
+            position: absolute;
+            width: 390px;
+            height: 390px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg,
+                    transparent 0deg,
+                    transparent 285deg,
+                    rgba(43, 227, 209, 0.24) 330deg,
+                    rgba(43, 227, 209, 0.02) 350deg,
+                    transparent 360deg);
+            opacity: 0;
+            animation: openingSweep 2.4s 0.35s linear forwards;
+        }
+
+        .opening-crosshair {
+            position: absolute;
+            width: 420px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(43, 227, 209, 0.28), transparent);
+            opacity: 0;
+            animation: openingCross 0.9s 0.9s ease-out forwards;
+        }
+
+        .opening-crosshair.v {
+            transform: rotate(90deg);
+        }
+
+        .opening-data {
+            position: absolute;
+            width: min(700px, 96vw);
+            bottom: 9vh;
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
+        .opening-status {
+            font-size: 10px;
+            color: rgba(127, 167, 182, 0.95);
+            margin-bottom: 9px;
+            animation: openingText 0.8s 0.35s both;
+        }
+
+        .opening-title {
+            margin: 0;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(22px, 5vw, 42px);
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-shadow: 0 0 22px rgba(43, 227, 209, 0.35);
+            animation: openingText 0.8s 0.65s both;
+        }
+
+        .opening-subtitle {
+            margin-top: 10px;
+            font-size: 9px;
+            color: #2be3d1;
+            animation: openingText 0.8s 0.9s both;
+        }
+
+        .opening-corner {
+            position: absolute;
+            width: 54px;
+            height: 54px;
+            border-color: rgba(43, 227, 209, 0.38);
+            border-style: solid;
+            opacity: 0;
+            animation: openingCorner 0.7s 0.2s forwards;
+        }
+
+        .opening-corner.tl {
+            left: 28px;
+            top: 28px;
+            border-width: 1px 0 0 1px;
+        }
+
+        .opening-corner.tr {
+            right: 28px;
+            top: 28px;
+            border-width: 1px 1px 0 0;
+        }
+
+        .opening-corner.bl {
+            left: 28px;
+            bottom: 28px;
+            border-width: 0 0 1px 1px;
+        }
+
+        .opening-corner.br {
+            right: 28px;
+            bottom: 28px;
+            border-width: 0 1px 1px 0;
+        }
+
+        .opening-flash {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(43, 227, 209, 0.18);
+            filter: blur(22px);
+            opacity: 0;
+            animation: openingFlash 0.45s 2.45s ease-out forwards;
+        }
+
+        @keyframes openingCore {
+            0% {
+                transform: scale(0.2);
+                opacity: 0;
+            }
+            35% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.82);
+                opacity: 1;
+            }
+        }
+
+        @keyframes openingRing {
+            0% {
+                transform: scale(0.45);
+                opacity: 0;
+            }
+            35% {
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes openingSweep {
+            0% {
+                opacity: 0;
+                transform: rotate(-90deg);
+            }
+            20% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 0.8;
+                transform: rotate(270deg);
+            }
+        }
+
+        @keyframes openingCross {
+            0% {
+                transform: scaleX(0);
+                opacity: 0;
+            }
+            100% {
+                transform: scaleX(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes openingText {
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes openingCorner {
+            0% {
+                opacity: 0;
+                transform: scale(0.7);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes openingFlash {
+            0% {
+                opacity: 0;
+                transform: scale(0.4);
+            }
+            35% {
+                opacity: 0.9;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.7);
+            }
+        }
+
+        /* ============================================================
+           AMBIENT BACKGROUND ELEMENTS
+           ============================================================ */
+        .ambient-field {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .ambient-field::before,
+        .ambient-field::after {
+            content: "";
+            position: absolute;
+            left: -10%;
+            width: 120%;
+            height: 180px;
+            border-radius: 50%;
+            border-top: 1px solid rgba(43, 227, 209, 0.08);
+            border-bottom: 1px solid rgba(43, 227, 209, 0.025);
+            filter: blur(0.2px);
+            transform: rotate(-5deg);
+            animation: waterWave 11s ease-in-out infinite alternate;
+        }
+
+        .ambient-field::before {
+            top: 12%;
+            box-shadow: 0 0 55px rgba(43, 227, 209, 0.04);
+        }
+
+        .ambient-field::after {
+            top: 72%;
+            animation-duration: 15s;
+            animation-delay: -4s;
+            opacity: 0.7;
+        }
+
+        @keyframes waterWave {
+            from {
+                transform: translateX(-3%) rotate(-5deg) scaleY(0.8);
+            }
+            to {
+                transform: translateX(3%) rotate(-3deg) scaleY(1.25);
+            }
+        }
+
+        .data-orbit {
+            position: fixed;
+            border: 1px solid rgba(43, 227, 209, 0.055);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        .orbit-a {
+            width: 720px;
+            height: 720px;
+            right: -390px;
+            top: 18%;
+            box-shadow: 0 0 90px rgba(43, 227, 209, 0.035);
+            animation: orbitSpin 32s linear infinite;
+        }
+
+        .orbit-b {
+            width: 430px;
+            height: 430px;
+            left: -245px;
+            top: 48%;
+            box-shadow: 0 0 70px rgba(143, 134, 255, 0.035);
+            animation: orbitSpin 24s linear infinite reverse;
+        }
+
+        @keyframes orbitSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============================================================
+           PERFORMANCE OPTIMIZATION OVERRIDES
+           ============================================================ */
+        body {
+            background:
+                radial-gradient(circle at 12% 12%, rgba(43, 227, 209, 0.08), transparent 24%),
+                radial-gradient(circle at 88% 24%, rgba(143, 134, 255, 0.065), transparent 25%),
+                linear-gradient(135deg, #020910 0%, #031521 48%, #020a12 100%) !important;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            background-image:
+                linear-gradient(rgba(43, 227, 209, 0.022) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(43, 227, 209, 0.022) 1px, transparent 1px) !important;
+            background-size: 64px 64px !important;
+            opacity: 0.8;
+            mask-image: none !important;
+            -webkit-mask-image: none !important;
+        }
+
+        body::after {
+            animation: none !important;
+            filter: none !important;
+            opacity: 0.72 !important;
+            background:
+                radial-gradient(circle at 18% 30%, rgba(43, 227, 209, 0.075), transparent 18%),
+                radial-gradient(circle at 82% 22%, rgba(143, 134, 255, 0.055), transparent 17%),
+                radial-gradient(circle at 52% 78%, rgba(43, 227, 209, 0.045), transparent 22%) !important;
+        }
+
+        .sonar-background {
+            animation: none !important;
+            width: 360px !important;
+            height: 360px !important;
+            opacity: 0.55 !important;
+            box-shadow: none !important;
+        }
+
+        .sonar-background::before,
+        .sonar-background::after {
+            box-shadow: none !important;
+        }
+
+        .iot-particle {
+            animation: none !important;
+            width: 2px !important;
+            height: 2px !important;
+            opacity: 0.28 !important;
+            box-shadow: 0 0 5px rgba(43, 227, 209, 0.45) !important;
+        }
+
+        .panel {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            background: rgba(7, 27, 42, 0.88) !important;
+            box-shadow: 0 12px 30px -22px rgba(0, 0, 0, 0.65) !important;
+        }
+
+        /* ============================================================
+           HIDE GLASS DETECTION UI
+           ============================================================ */
+        #hc-sr04-panel,
+        #distance-status,
+        #glass-status,
+        #glass-status-2 {
+            display: none !important;
+        }
+
+        #pompa-status-text+#distance-status {
+            display: none !important;
+        }
+
+        /* ============================================================
+           VOICE ASSISTANT — GATE (full screen, before dashboard opens)
+           ============================================================ */
+        #voice-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background:
+                radial-gradient(circle at 50% 30%, rgba(43, 227, 209, 0.10), transparent 45%),
+                var(--abyss);
+            transition: opacity 0.6s ease, visibility 0.6s ease, transform 0.6s ease;
+        }
+
+        #voice-gate.gate-hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: scale(0.98);
+        }
+
+        .voice-gate-card {
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            padding: 2.6rem 2rem 2.2rem;
+        }
+
+        .voice-gate-eyebrow {
+            justify-content: center;
+        }
+
+        .voice-gate-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: var(--foam);
+            margin: 0.8rem 0 0.5rem;
+        }
+
+        .voice-gate-sub {
+            color: var(--mist);
+            font-size: 0.88rem;
+            line-height: 1.55;
+            margin-bottom: 1.9rem;
+        }
+
+        .voice-mic-btn {
+            position: relative;
+            width: 108px;
+            height: 108px;
+            margin: 0 auto 1.6rem;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 30% 30%, rgba(43, 227, 209, 0.4), rgba(43, 227, 209, 0.05));
+            border: 1px solid var(--stroke-strong);
+            color: var(--aqua);
+            font-size: 2rem;
+            box-shadow: 0 0 26px rgba(43, 227, 209, 0.25), inset 0 0 16px rgba(43, 227, 209, 0.12);
+            transition: transform 0.2s ease, box-shadow 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .voice-mic-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .voice-mic-btn:active {
+            transform: translateY(0) scale(0.96);
+        }
+
+        .voice-mic-btn .mic-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1.5px solid rgba(43, 227, 209, 0.4);
+            opacity: 0;
+        }
+
+        .voice-mic-btn.listening {
+            color: var(--coral);
+            border-color: rgba(255, 110, 99, 0.55);
+            background: radial-gradient(circle at 30% 30%, rgba(255, 110, 99, 0.35), rgba(255, 110, 99, 0.05));
+            box-shadow: 0 0 30px rgba(255, 110, 99, 0.3), inset 0 0 16px rgba(255, 110, 99, 0.14);
+        }
+
+        .voice-mic-btn.listening .mic-ring {
+            border-color: rgba(255, 110, 99, 0.45);
+            animation: micRingPulse 1.8s ease-out infinite;
+        }
+
+        .voice-mic-btn.listening .mic-ring.mr2 {
+            animation-delay: 0.6s;
+        }
+
+        .voice-mic-btn.listening .mic-ring.mr3 {
+            animation-delay: 1.2s;
+        }
+
+        @keyframes micRingPulse {
+            0% {
+                transform: scale(0.85);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(1.9);
+                opacity: 0;
+            }
+        }
+
+        .voice-status-line {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+            color: var(--mist);
+            min-height: 1.4em;
+            margin-bottom: 1.4rem;
+        }
+
+        .voice-status-line.recognized {
+            color: var(--aqua);
+        }
+
+        .voice-command-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            text-align: left;
+            background: rgba(140, 205, 222, 0.05);
+            border: 1px solid var(--stroke);
+            border-radius: 14px;
+            padding: 0.9rem 1rem;
+        }
+
+        .voice-command-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.78rem;
+            color: var(--foam);
+        }
+
+        .voice-command-row i {
+            color: var(--aqua);
+            width: 16px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .voice-command-row .cmd {
+            font-family: 'Space Mono', monospace;
+            color: var(--aqua);
+        }
+
+
+        /* ============================================================
+           ASSISTANT CHAT — same commands as voice
+           ============================================================ */
+        #assistant-chat {
+            position: fixed;
+            right: 1.25rem;
+            bottom: 5.9rem;
+            z-index: 91;
+            width: min(360px, calc(100vw - 2rem));
+            display: none;
+            flex-direction: column;
+            background: var(--surface-2);
+            border: 1px solid var(--stroke-strong);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 18px 50px -22px rgba(0,0,0,.8);
+        }
+        #assistant-chat.chat-show { display: flex; }
+        .assistant-chat-head {
+            padding: .8rem 1rem;
+            border-bottom: 1px solid var(--stroke);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+        .assistant-chat-title {
+            color: var(--foam);
+            font-weight: 700;
+            font-size: .9rem;
+        }
+        .assistant-chat-messages {
+            height: 230px;
+            overflow-y: auto;
+            padding: .8rem;
+            display:flex;
+            flex-direction:column;
+            gap:.55rem;
+        }
+        .assistant-msg {
+            max-width: 88%;
+            padding: .55rem .7rem;
+            border-radius: 12px;
+            font-size: .76rem;
+            line-height:1.4;
+        }
+        .assistant-msg.user {
+            align-self:flex-end;
+            background: rgba(43,227,209,.12);
+            color:var(--foam);
+        }
+        .assistant-msg.bot {
+            align-self:flex-start;
+            background: rgba(140,205,222,.07);
+            color:var(--mist);
+        }
+        .assistant-chat-form {
+            display:flex;
+            gap:.45rem;
+            padding:.65rem;
+            border-top:1px solid var(--stroke);
+        }
+        .assistant-chat-input {
+            flex:1;
+            min-width:0;
+            border:1px solid var(--stroke-strong);
+            border-radius:10px;
+            background:rgba(0,0,0,.15);
+            color:var(--foam);
+            padding:.65rem .7rem;
+            outline:none;
+        }
+        .assistant-chat-send {
+            border:1px solid var(--stroke-strong);
+            border-radius:10px;
+            padding:0 .8rem;
+            background:rgba(43,227,209,.12);
+            color:var(--aqua);
+            cursor:pointer;
+        }
+        .voice-widget-actions {
+            display:flex;
+            gap:.35rem;
+            align-items:center;
+        }
+        .assistant-chat-toggle {
+            width:34px;
+            height:34px;
+            border-radius:50%;
+            border:1px solid var(--stroke-strong);
+            background:rgba(43,227,209,.08);
+            color:var(--aqua);
+            cursor:pointer;
+        }
+
+        /* ============================================================
+           VOICE ASSISTANT — FLOATING WIDGET (after dashboard opens)
+           ============================================================ */
+        #voice-widget {
+            position: fixed;
+            right: 1.25rem;
+            bottom: 1.25rem;
+            z-index: 90;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.55rem 0.7rem 0.55rem 0.55rem;
+            border-radius: 999px;
+            background: var(--surface-2);
+            border: 1px solid var(--stroke-strong);
+            box-shadow: 0 16px 40px -20px rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(16px);
+            pointer-events: none;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            max-width: min(320px, calc(100vw - 2rem));
+        }
+
+        #voice-widget.widget-show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .voice-widget-btn {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            border: 1px solid var(--stroke-strong);
+            background: rgba(43, 227, 209, 0.1);
+            color: var(--aqua);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.25s ease;
+        }
+
+        .voice-widget-btn.listening {
+            color: var(--coral);
+            border-color: rgba(255, 110, 99, 0.55);
+            background: rgba(255, 110, 99, 0.14);
+        }
+
+        .voice-widget-btn .mic-ring {
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 110, 99, 0.4);
+            opacity: 0;
+        }
+
+        .voice-widget-btn.listening .mic-ring {
+            animation: micRingPulse 1.8s ease-out infinite;
+        }
+
+        .voice-widget-text {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .voice-widget-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--mist);
+        }
+
+        .voice-widget-transcript {
+            font-size: 0.76rem;
+            color: var(--foam);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 190px;
+        }
+
+        /* ============================================================
+           ASSISTANT CHAT — typed commands using the same COMMANDS as voice
+           ============================================================ */
+        .assistant-chat {
+            width: 100%;
+            margin-top: 1.15rem;
+            text-align: left;
+            padding: 0.9rem;
+            border-radius: 16px;
+            background: rgba(140, 205, 222, 0.045);
+            border: 1px solid var(--stroke);
+        }
+
+        .assistant-chat-head {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin-bottom: 0.7rem;
+            color: var(--foam);
+            font: 600 0.72rem 'Space Mono', monospace;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .assistant-chat-head i {
+            color: var(--aqua);
+        }
+
+        .assistant-chat-form {
+            display: flex;
+            gap: 0.55rem;
+        }
+
+        .assistant-chat-input {
+            min-width: 0;
+            flex: 1;
+            padding: 0.72rem 0.8rem;
+            border-radius: 11px;
+            border: 1px solid var(--stroke);
+            outline: none;
+            background: rgba(3, 12, 19, 0.72);
+            color: var(--foam);
+            font: 0.76rem 'Inter', sans-serif;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .assistant-chat-input::placeholder {
+            color: #6f929f;
+        }
+
+        .assistant-chat-input:focus {
+            border-color: var(--stroke-strong);
+            box-shadow: 0 0 0 3px rgba(43, 227, 209, 0.06);
+        }
+
+        .assistant-chat-send {
+            width: 44px;
+            min-width: 44px;
+            border: 1px solid rgba(43, 227, 209, 0.35);
+            border-radius: 11px;
+            background: rgba(43, 227, 209, 0.1);
+            color: var(--aqua);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .assistant-chat-send:hover {
+            background: rgba(43, 227, 209, 0.17);
+            border-color: rgba(43, 227, 209, 0.55);
+            transform: translateY(-1px);
+        }
+
+        .assistant-chat-hint {
+            margin-top: 0.55rem;
+            color: var(--mist);
+            font: 0.58rem 'Space Mono', monospace;
+            line-height: 1.5;
+        }
+
+        .assistant-chat-hint span {
+            color: var(--aqua);
+        }
+
+        #voice-widget {
+            flex-wrap: wrap;
+            border-radius: 18px;
+            padding: 0.55rem;
+        }
+
+        .voice-widget-chat {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            width: 100%;
+            padding-top: 0.45rem;
+            border-top: 1px solid rgba(140, 205, 222, 0.09);
+        }
+
+        .voice-widget-chat input {
+            min-width: 0;
+            flex: 1;
+            padding: 0.58rem 0.7rem;
+            border-radius: 10px;
+            border: 1px solid var(--stroke);
+            outline: none;
+            background: rgba(3, 12, 19, 0.65);
+            color: var(--foam);
+            font-size: 0.72rem;
+        }
+
+        .voice-widget-chat input::placeholder {
+            color: #6f929f;
+        }
+
+        .voice-widget-chat input:focus {
+            border-color: var(--stroke-strong);
+        }
+
+        .voice-widget-chat button {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            border: 1px solid rgba(43, 227, 209, 0.35);
+            border-radius: 10px;
+            background: rgba(43, 227, 209, 0.1);
+            color: var(--aqua);
+            cursor: pointer;
+        }
+
+        @media (max-width: 560px) {
+            .assistant-chat-form {
+                gap: 0.4rem;
+            }
+
+            .assistant-chat-input {
+                font-size: 0.72rem;
+            }
+
+            #voice-widget {
+                right: 0.75rem;
+                bottom: 0.75rem;
+                max-width: calc(100vw - 1.5rem);
+            }
+        }
+
+        /* ============================================================
+           DASHBOARD VISIBILITY (gated by voice command)
+           ============================================================ */
+        #dashboard-root.dashboard-locked {
+            display: none;
+        }
+
+        #crew-panel-body.crew-locked {
+            display: none;
+        }
+
+        .crew-lock-notice {
+            display: none;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 1.2rem 1.1rem;
+            border-radius: 14px;
+            background: rgba(140, 205, 222, 0.05);
+            border: 1px dashed var(--stroke-strong);
+            color: var(--mist);
+            font-size: 0.82rem;
+        }
+
+        .crew-lock-notice.show {
+            display: flex;
+        }
+
+        .crew-lock-notice i {
+            color: var(--aqua);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .crew-lock-notice .cmd {
+            font-family: 'Space Mono', monospace;
+            color: var(--aqua);
+        }
+
+        @keyframes crewHighlightPulse {
+            0%, 100% {
+                box-shadow: 0 16px 40px -24px rgba(0, 0, 0, 0.6);
+                border-color: var(--stroke);
+            }
+            50% {
+                box-shadow: 0 0 0 3px rgba(43, 227, 209, 0.35), 0 16px 40px -24px rgba(0, 0, 0, 0.6);
+                border-color: rgba(43, 227, 209, 0.5);
+            }
+        }
+
+        .crew-just-opened {
+            animation: crewHighlightPulse 1.4s ease-in-out 2;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 900px) {
+            main {
+                max-width: 1120px !important;
+            }
+
+            main>header.panel {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            main>section:nth-of-type(1),
+            main>section:nth-of-type(2) {
+                grid-template-columns: 1fr !important;
+            }
+
+            main>section:nth-of-type(3)>.panel {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            .crew-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .crew-card:nth-child(2),
+            .crew-card:nth-child(5) {
+                transform: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .crew-modal {
+                grid-template-columns: 1fr;
+                max-height: 92vh;
+                overflow-y: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .opening-ring.r3 {
+                width: 340px;
+                height: 340px;
+            }
+
+            .opening-ring.r2 {
+                width: 230px;
+                height: 230px;
+            }
+
+            .opening-sweep {
+                width: 300px;
+                height: 300px;
+            }
+
+            .opening-crosshair {
+                width: 300px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            main {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            .crew-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .crew-card:nth-child(2),
+            .crew-card:nth-child(5) {
+                transform: none;
+            }
+
+            .panel {
+                border-radius: 18px;
+            }
+
+            .gauge-value .font-mono {
+                font-size: 1.45rem;
+            }
+
+            .turbidity-card {
+                min-height: 205px;
+            }
+
+            .turbidity-readout {
+                align-items: center;
+            }
+
+            .turbidity-footer {
+                font-size: 0.52rem;
+            }
+
+            .voice-gate-card {
+                padding: 2.1rem 1.3rem 1.8rem;
+            }
+
+            #voice-widget {
+                right: 0.8rem;
+                bottom: 0.8rem;
+            }
+
+            .voice-widget-transcript {
+                max-width: 120px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body::before {
+                background-size: 80px 80px !important;
+                opacity: 0.55;
+            }
+
+            .sonar-background {
+                width: 280px !important;
+                height: 280px !important;
+                left: -130px !important;
+                bottom: -100px !important;
+            }
+
+            .iot-particle {
+                opacity: 0.18 !important;
+            }
+
+            .orbit-a {
+                width: 430px;
+                height: 430px;
+                right: -280px;
+            }
+
+            .orbit-b {
+                width: 300px;
+                height: 300px;
+                left: -210px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .dot.pulse~.dot-ring,
+            .pour-rig.pouring .sonar-ring,
+            .pour-rig.pouring .drop,
+            .pour-rig.pouring .bubble,
+            .cup-water::before,
+            .headline-grad,
+            .brand-mark,
+            header.panel::after,
+            .lift::before,
+            .idle-ping,
+            .flash,
+            .pump-ring.on::before,
+            .cup-wrap,
+            .pour-tank-shadow,
+            .gauge-wrap,
+            .crew-card::after,
+            .crew-modal-scanbeam,
+            .boot-ring,
+            .boot-core,
+            .boot-log div,
+            body::after,
+            .iot-particle,
+            .sonar-background,
+            .ambient-field::before,
+            .ambient-field::after,
+            .data-orbit,
+            .voice-mic-btn.listening .mic-ring,
+            .voice-widget-btn.listening .mic-ring,
+            .crew-just-opened,
+            body::after {
+                animation: none !important;
+            }
+
+            .brand-mark,
+            .crew-card {
+                transition: none !important;
+            }
+
+            .enter {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+
+            .crew-modal,
+            .crew-modal-backdrop {
+                transition: opacity 0.15s ease !important;
+            }
+
+            #boot-screen {
+                display: none !important;
+            }
+
+            #systemOpening * {
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased pb-16">
+
+    <!-- ===== FUTURISTIC SYSTEM OPENING ===== -->
+    <div id="systemOpening" aria-label="System opening">
+        <div class="opening-grid"></div>
+        <div class="opening-vignette"></div>
+
+        <div class="opening-corner tl"></div>
+        <div class="opening-corner tr"></div>
+        <div class="opening-corner bl"></div>
+        <div class="opening-corner br"></div>
+
+        <div class="opening-stage">
+            <div class="opening-ring r3"></div>
+            <div class="opening-ring r2"></div>
+            <div class="opening-ring r1"></div>
+            <div class="opening-sweep"></div>
+            <div class="opening-crosshair"></div>
+            <div class="opening-crosshair v"></div>
+            <div class="opening-core"></div>
+            <div class="opening-flash"></div>
+        </div>
+
+        <div class="opening-data">
+            <div class="opening-status">● SYSTEM INITIALIZING // WATER IoT NETWORK</div>
+            <h1 class="opening-title">WATER DISPENSER</h1>
+            <div class="opening-subtitle">SMART MONITORING CONSOLE • SYSTEM READY</div>
+        </div>
+    </div>
+
+    <!-- ===== BOOT SCREEN ===== -->
+    <div id="boot-screen">
+        <div class="boot-glow"></div>
+        <div class="boot-emblem">
+            <span class="boot-ring r1"></span>
+            <span class="boot-ring r2"></span>
+            <span class="boot-ring r3"></span>
+            <div class="boot-core"><i class="fa-solid fa-droplet"></i></div>
+        </div>
+        <div class="boot-wordmark">KELOMPOK <span>3</span></div>
+        <div class="boot-progress-track">
+            <div id="boot-progress-fill" class="boot-progress-fill"></div>
+        </div>
+        <div id="boot-log" class="boot-log"></div>
+    </div>
+
+    <!-- ===== VOICE ASSISTANT GATE (shown instead of dashboard until unlocked) ===== -->
+    <div id="voice-gate" aria-label="Kontrol suara">
+        <div class="panel voice-gate-card">
+            <div class="panel-eyebrow voice-gate-eyebrow" style="display:flex;">Asisten Suara</div>
+            <h1 class="voice-gate-title">Dashboard Terkunci</h1>
+            <p class="voice-gate-sub">Ucapkan perintah suara untuk membuka dashboard. Tekan mikrofon untuk mulai mendengarkan.</p>
+
+            <button id="voice-mic-btn" class="voice-mic-btn" type="button" aria-pressed="false" aria-label="Aktifkan mikrofon">
+                <span class="mic-ring mr1"></span>
+                <span class="mic-ring mr2"></span>
+                <span class="mic-ring mr3"></span>
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+
+            <div id="voice-status-line" class="voice-status-line">Mikrofon nonaktif. Ketuk untuk mengaktifkan.</div>
+
+            <div class="assistant-chat" aria-label="Chat dengan asisten">
+                <div class="assistant-chat-head">
+                    <i class="fa-solid fa-comments"></i>
+                    <span>Chat dengan Asisten</span>
+                </div>
+                <form id="assistant-chat-form" class="assistant-chat-form">
+                    <input
+                        id="assistant-chat-input"
+                        class="assistant-chat-input"
+                        type="text"
+                        autocomplete="off"
+                        placeholder='Ketik perintah, misalnya "buka dashboard"'
+                        aria-label="Ketik perintah untuk asisten"
+                    >
+                    <button class="assistant-chat-send" type="submit" aria-label="Kirim perintah">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+                <div class="assistant-chat-hint">
+                    Chat menggunakan <span>perintah yang sama</span> seperti asisten suara.
+                </div>
+            </div>
+
+            <div class="voice-command-list">
+                <div class="voice-command-row"><i class="fa-solid fa-quote-left"></i> <span>Ucapkan <span class="cmd">"buka dashboard"</span> untuk membuka konsol</span></div>
+                <div class="voice-command-row"><i class="fa-solid fa-quote-left"></i> <span>Ucapkan <span class="cmd">"buka anggota kelompok"</span> untuk melihat data anggota</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== BACKGROUND ELEMENTS ===== -->
+    <div class="sonar-background"></div>
+    <div class="ambient-field" aria-hidden="true"></div>
+    <div class="data-orbit orbit-a" aria-hidden="true"></div>
+    <div class="data-orbit orbit-b" aria-hidden="true"></div>
+
+    <div class="iot-particles" aria-hidden="true">
+        <span class="iot-particle" style="left:8%;--drift:35px;--duration:14s;"></span>
+        <span class="iot-particle" style="left:17%;--drift:-45px;--duration:19s;"></span>
+        <span class="iot-particle" style="left:27%;--drift:60px;--duration:16s;"></span>
+        <span class="iot-particle" style="left:38%;--drift:-30px;--duration:21s;"></span>
+        <span class="iot-particle" style="left:48%;--drift:45px;--duration:17s;"></span>
+        <span class="iot-particle" style="left:59%;--drift:-55px;--duration:20s;"></span>
+        <span class="iot-particle" style="left:68%;--drift:30px;--duration:15s;"></span>
+        <span class="iot-particle" style="left:77%;--drift:-40px;--duration:18s;"></span>
+        <span class="iot-particle" style="left:87%;--drift:55px;--duration:22s;"></span>
+        <span class="iot-particle" style="left:94%;--drift:-25px;--duration:16s;"></span>
+    </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div id="toast-container" class="fixed top-20 right-4 z-[100] flex flex-col gap-3 max-w-sm w-[90vw]"></div>
+
+    <!-- ===== FLOATING VOICE WIDGET (visible after dashboard is unlocked) ===== -->
+    
+    <!-- ===== CHAT ASSISTANT (uses exactly the same COMMANDS as voice) ===== -->
+    <div id="assistant-chat" aria-label="Chat dengan Asisten">
+        <div class="assistant-chat-head">
+            <span class="assistant-chat-title">Chat dengan Asisten</span>
+            <button type="button" id="assistant-chat-close" class="assistant-chat-toggle" aria-label="Tutup chat">×</button>
+        </div>
+        <div id="assistant-chat-messages" class="assistant-chat-messages">
+            <div class="assistant-msg bot">Silakan ketik perintah yang sama seperti perintah suara.</div>
+        </div>
+        <form id="assistant-widget-chat-form" class="assistant-chat-form">
+            <input id="assistant-widget-chat-input" class="assistant-chat-input"
+                   type="text" autocomplete="off"
+                   placeholder="Ketik perintah..." />
+            <button class="assistant-chat-send" type="submit">Kirim</button>
+        </form>
+    </div>
+
+<div id="voice-widget" aria-label="Kontrol suara aktif">
+        <button id="voice-widget-btn" class="voice-widget-btn" type="button" aria-pressed="false" aria-label="Aktifkan/nonaktifkan mikrofon">
+            <span class="mic-ring"></span>
+            <i class="fa-solid fa-microphone"></i>
+        </button>
+        <div class="voice-widget-text">
+            <span class="voice-widget-label">Asisten</span>
+            <span id="voice-widget-transcript" class="voice-widget-transcript">Ketuk untuk bicara</span>
+        </div>
+        <form id="voice-widget-chat-form" class="voice-widget-chat" aria-label="Chat dengan asisten">
+            <input
+                id="voice-widget-chat-input"
+                type="text"
+                autocomplete="off"
+                placeholder="Ketik perintah..."
+                aria-label="Ketik perintah untuk asisten"
+            >
+            <button type="submit" aria-label="Kirim perintah">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- ===== MAIN CONTENT (locked until "buka dashboard" is heard) ===== -->
+    <main id="dashboard-root" class="dashboard-locked max-w-5xl mx-auto px-5 py-10">
+
+        <!-- ===== SECTION: POUR RIG + WATER QUALITY + PUMP ===== -->
+        <section class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 mb-6">
+            <!-- Pour Rig Panel -->
+            <div class="panel lift enter p-6 flex flex-col items-center justify-center" style="transition-delay:0.15s">
+                <div class="panel-eyebrow mb-5 self-start">Titik Tuang</div>
+                <div id="pour-rig" class="pour-rig">
+                    <span class="idle-ping"></span>
+                    <span class="sonar-ring r1"></span>
+                    <span class="sonar-ring r2"></span>
+                    <span class="sonar-ring r3"></span>
+                    <div class="cup-glow"></div>
+                    <div class="spout">
+                        <span class="drop d1"></span>
+                        <span class="drop d2"></span>
+                        <span class="drop d3"></span>
+                    </div>
+                    <div class="pour-tank-shadow"></div>
+                    <div class="cup-wrap">
+                        <div class="cup-border"></div>
+                        <div class="cup-inner">
+                            <div id="cup-water" class="cup-water"></div>
+                            <span class="bubble b1"></span>
+                            <span class="bubble b2"></span>
+                            <span class="bubble b3"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="cup-caption">
+                    <span id="glass-status" class="badge badge-neutral flip3d-el">Belum ada data</span>
+                </div>
+            </div>
+
+            <!-- Water Quality & Pump -->
+            <div class="flex flex-col gap-6">
+                <!-- Water Quality Panel -->
+                <div class="panel lift enter p-6 flex flex-col sm:flex-row sm:items-center gap-5" style="transition-delay:0.25s">
+                    <div class="flex-1">
+                        <div class="panel-eyebrow mb-2">Kualitas Air</div>
+                        <div id="water-quality-label" class="font-display text-4xl md:text-5xl font-semibold text-[var(--foam)]">—</div>
+                        <p class="text-sm text-[var(--mist)] mt-1">Dinilai dari sensor turbidity secara berkelanjutan.</p>
+                    </div>
+                    <div class="flex sm:flex-col gap-3 sm:items-end">
+                        <div class="text-right">
+                            <div class="text-[0.65rem] uppercase tracking-widest text-[var(--mist)] font-mono">ADC</div>
+                            <div id="turbidity-value" class="font-mono text-3xl text-[var(--foam)]">--</div>
+                        </div>
+                        <span id="water-quality" class="badge badge-neutral">--</span>
+                    </div>
+                </div>
+
+                <!-- Pump Panel -->
+                <div class="panel lift enter p-6 flex items-center gap-5" style="transition-delay:0.35s">
+                    <div id="pompa-icon-bg" class="pump-ring">
+                        <i id="pompa-icon" class="fa-solid fa-power-off text-xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="panel-eyebrow mb-1">Pompa Otomatis</div>
+                        <div id="pompa-status-text" class="font-display text-3xl font-semibold text-[var(--foam)] flip3d-el">STATUS: OFF</div>
+                    </div>
+                    <span id="distance-status" class="badge badge-neutral hidden sm:inline-flex flip3d-el">Belum ada data</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SECTION: TURBIDITY + HC-SR04 ===== -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            <!-- Turbidity Card -->
+            <div class="panel lift enter turbidity-card p-6" style="transition-delay:0.45s">
+                <div class="turbidity-head">
+                    <div>
+                        <div class="panel-eyebrow mb-2">Kejernihan Air</div>
+                        <div class="turbidity-title">Monitoring Turbidity</div>
+                    </div>
+                    <div class="turbidity-icon" aria-hidden="true">
+                        <i class="fa-solid fa-droplet"></i>
+                    </div>
+                </div>
+
+                <div class="turbidity-readout">
+                    <div>
+                        <div id="turbidity-value-2" class="turbidity-number">--</div>
+                        <div class="turbidity-unit">ADC</div>
+                    </div>
+                    <span id="turbidity-status" class="badge badge-neutral">Belum ada data</span>
+                </div>
+
+                <div class="turbidity-meter" aria-label="Level turbidity">
+                    <div class="turbidity-meter-fill" id="turbidity-meter-fill"></div>
+                    <div class="turbidity-threshold" style="left:58.65%;" title="Ambang 600 ADC"></div>
+                </div>
+                <div class="turbidity-scale">
+                    <span>0</span>
+                    <span>600 • ambang</span>
+                    <span>1023</span>
+                </div>
+
+                <div class="turbidity-footer">
+                    <span><i class="fa-solid fa-wave-square"></i> Sensor turbidity aktif</span>
+                    <span id="turbidity-state-text">Menunggu data</span>
+                </div>
+            </div>
+
+            <!-- HC-SR04 Panel (hidden) -->
+            <div id="hc-sr04-panel" class="panel lift enter p-6" style="transition-delay:0.55s">
+                <div class="panel-eyebrow mb-4">Jarak Sensor (HC-SR04)</div>
+                <div class="gauge-wrap">
+                    <svg viewBox="0 0 200 116" class="w-full">
+                        <path class="gauge-track" d="M16,100 A84,84 0 0 1 184,100" />
+                        <path id="distance-gauge-fill" class="gauge-fill" d="M16,100 A84,84 0 0 1 184,100" />
+                        <circle class="gauge-tick" cx="100" cy="16" r="2.6" />
+                        <circle class="gauge-tick-minor" cx="24" cy="70" r="1.8" />
+                        <circle class="gauge-tick-minor" cx="176" cy="70" r="1.8" />
+                    </svg>
+                    <div class="gauge-value">
+                        <div class="font-mono text-2xl text-[var(--foam)]">
+                            <span id="level-value">--</span> cm
+                        </div>
+                        <div class="text-[0.65rem] uppercase tracking-widest text-[var(--mist)] font-mono">deteksi gelas &lt; 10 cm</div>
+                    </div>
+                </div>
+                <div class="hairline my-4"></div>
+                <div class="flex items-center justify-between mt-[62px]">
+                    <span class="text-xs text-[var(--mist)] font-mono">Gelas</span>
+                    <span id="glass-status-2" class="badge badge-neutral">Belum ada data</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SECTION: CREW MEMBERS ===== -->
+        <section class="mb-6 enter" style="transition-delay:0.65s">
+            <div class="panel lift p-6 md:p-8">
+                <div class="glare"></div>
+                <div class="flex items-start justify-between flex-wrap gap-3 mb-6">
+                    <div>
+                        <div class="panel-eyebrow mb-2">Anggota</div>
+                        <h2 class="font-display text-2xl md:text-3xl font-semibold text-[var(--foam)]">Anggota Kelompok</h2>
+                        <p class="text-sm text-[var(--mist)] mt-1">Tim di balik Smart Water Dispenser</p>
+                    </div>
+                    <span class="badge badge-aqua"><i class="fa-solid fa-people-group"></i> 6 Anggota</span>
+                </div>
+
+                <div id="crew-lock-notice" class="crew-lock-notice show">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Data anggota terkunci. Ucapkan <span class="cmd">"buka anggota kelompok"</span> untuk membukanya.</span>
+                </div>
+
+                <div id="crew-panel-body" class="crew-locked">
+                    <div class="crew-grid" id="crew-grid">
+                        <!-- Card 1 -->
+                        <div class="crew-card" tabindex="0" role="button"
+                            data-name="Gilbert Dwi Konda'"
+                            data-role="Leader"
+                            data-phone="082193676201"
+                            data-badge="Hardware"
+                            data-img="https://raw.githubusercontent.com/agipmarcelosabi1-hash/dispenser-IoT/main/WhatsApp%20Image%202026-08-24%20at%2019.08.51.jpeg"
+                            data-desc="Memimpin koordinasi tim dan bertanggung jawab atas rangkaian hardware dispenser — dari sensor hingga pompa — memastikan semua komponen fisik terpasang dan bekerja sesuai rencana.">
+                            <div class="crew-avatar">
+                                <img class="crew-avatar-img" src="https://raw.githubusercontent.com/agipmarcelosabi1-hash/dispenser-IoT/main/WhatsApp%20Image%202026-08-24%20at%2019.08.51.jpeg" alt="Foto Gilbert Dwi Konda'">
+                            </div>
+                            <div class="crew-name">Gilbert Dwi Konda'</div>
+                            <div class="crew-role">Leader</div>
+                            <div class="crew-nim">No. Telepon: 082193676201</div>
+                            <span class="crew-badge">Hardware</span>
+                            <span class="crew-tap-hint"><i class="fa-solid fa-expand"></i> Lihat profil</span>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="crew-card" tabindex="0" role="button"
+                            data-name="Agip Marcelo Sa'bi"
+                            data-role="IoT Engineer"
+                            data-phone="082319512774"
+                            data-badge="Firmware"
+                            data-img="https://raw.githubusercontent.com/agipmarcelosabi1-hash/dispenser-IoT/main/WhatsApp%20Image%202026-05-31%20at%2020.18.50.jpeg"
+                            data-desc="Menulis firmware ESP8266 dan menjembatani data sensor ke Firebase Realtime Database, termasuk logika ambang kekeruhan dan kontrol pompa otomatis.">
+                            <div class="crew-avatar">
+                                <img class="crew-avatar-img" src="https://raw.githubusercontent.com/agipmarcelosabi1-hash/dispenser-IoT/main/WhatsApp%20Image%202026-05-31%20at%2020.18.50.jpeg" alt="Foto Agip Marcelo Sa'bi">
+                            </div>
+                            <div class="crew-name">Agip Marcelo Sa'bi</div>
+                            <div class="crew-role">IoT Engineer</div>
+                            <div class="crew-nim">No. Telepon: 082319512774</div>
+                            <span class="crew-badge">Firmware</span>
+                            <span class="crew-tap-hint"><i class="fa-solid fa-expand"></i> Lihat profil</span>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="crew-card" tabindex="0" role="button"
+                            data-name="Cindy Aurel Aris"
+                            data-role="Infografis"
+                            data-phone="085796648793"
+                            data-badge="Visual"
+                            data-img="https://raw.githubusercontent.com/agipmarcelosabi1-hash/iot-dashboard/main/WhatsApp%20Image%202026-08-25%20at%2019.50.25.jpeg"
+                            data-desc="Merancang identitas visual dan infografis pendukung dokumentasi proyek, memastikan data teknis mudah dipahami secara visual.">
+                            <div class="crew-avatar">
+                                <img class="crew-avatar-img" src="https://raw.githubusercontent.com/agipmarcelosabi1-hash/iot-dashboard/main/WhatsApp%20Image%202026-08-25%20at%2019.50.25.jpeg" alt="Foto Cindy Aurel Aris">
+                            </div>
+                            <div class="crew-name">Cindy Aurel Aris</div>
+                            <div class="crew-role">Infografis</div>
+                            <div class="crew-nim">No. Telepon: 085796648793</div>
+                            <span class="crew-badge">Visual</span>
+                            <span class="crew-tap-hint"><i class="fa-solid fa-expand"></i> Lihat profil</span>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div class="crew-card" tabindex="0" role="button"
+                            data-name="Abiam Baswara Tandirerung"
+                            data-role="Infografis"
+                            data-phone="082297652718"
+                            data-badge="Visual"
+                            data-img="https://raw.githubusercontent.com/agipmarcelosabi1-hash/dispenser-IoT/main/WhatsApp%20Image%202026-08-25%20at%2012.44.20.jpeg"
+                            data-desc="Menyusun materi visual dan infografis proyek, membantu menerjemahkan alur kerja sistem menjadi diagram yang mudah dipahami.">
+                            <div class="crew-avatar">
+                                <img class="crew-avatar-img" src="https://raw.githubusercontent.com/agipmarcelosabi1-hash/dispenser-IoT/main/WhatsApp%20Image%202026-08-25%20at%2012.44.20.jpeg" alt="Foto Abiam Baswara Tandirerung">
+                            </div>
+                            <div class="crew-name">Abiam Baswara Tandirerung</div>
+                            <div class="crew-role">Editor</div>
+                            <div class="crew-nim">No. Telepon: 082297652718</div>
+                            <span class="crew-badge">Infografis</span>
+                            <span class="crew-tap-hint"><i class="fa-solid fa-expand"></i> Lihat profil</span>
+                        </div>
+
+                        <!-- Card 5 -->
+                        <div class="crew-card" tabindex="0" role="button"
+                            data-name="Tirzha Eunike Valerina Ere"
+                            data-role="Infografis"
+                            data-phone="082344392330"
+                            data-badge="Visual"
+                            data-img="https://raw.githubusercontent.com/agipmarcelosabi1-hash/dispenser-IoT/main/WhatsApp%20Image%202026-08-25%20at%2013.10.45.jpeg"
+                            data-desc="Mendukung penyusunan infografis dan tata letak visual dashboard agar informasi tersampaikan dengan jelas dan menarik.">
+                            <div class="crew-avatar">
+                                <img class="crew-avatar-img" src="https://raw.githubusercontent.com/agipmarcelosabi1-hash/dispenser-IoT/main/WhatsApp%20Image%202026-08-25%20at%2013.10.45.jpeg" alt="Foto Tirzha Eunike Valerina Ere">
+                            </div>
+                            <div class="crew-name">Tirzha Eunike Valerina Ere</div>
+                            <div class="crew-role">Infografis</div>
+                            <div class="crew-nim">No. Telepon: 082344392330</div>
+                            <span class="crew-badge">Visual</span>
+                            <span class="crew-tap-hint"><i class="fa-solid fa-expand"></i> Lihat profil</span>
+                        </div>
+
+                        <!-- Card 6 -->
+                        <div class="crew-card" tabindex="0" role="button"
+                            data-name="Adventcya Christy"
+                            data-role="Infografis"
+                            data-phone="082239820449"
+                            data-badge="Visual"
+                            data-img="https://raw.githubusercontent.com/agipmarcelosabi1-hash/iot-dashboard/main/WhatsApp%20Image%202026-09-10%20at%2009.52.12.jpeg"
+                            data-desc="Turut menyusun infografis dan elemen visual pendukung, serta membantu dokumentasi akhir proyek dispenser pintar ini.">
+                            <div class="crew-avatar">
+                                <img class="crew-avatar-img" src="https://raw.githubusercontent.com/agipmarcelosabi1-hash/iot-dashboard/main/WhatsApp%20Image%202026-09-10%20at%2009.52.12.jpeg" alt="Foto Adventcya Christy">
+                            </div>
+                            <div class="crew-name">Adventcya Christy</div>
+                            <div class="crew-role">Infografis</div>
+                            <div class="crew-nim">No. Telepon: 082239820449</div>
+                            <span class="crew-badge">Visual</span>
+                            <span class="crew-tap-hint"><i class="fa-solid fa-expand"></i> Lihat profil</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="text-center text-[var(--mist)] text-xs flex items-center justify-center gap-2 font-mono">
+            <i class="fa-regular fa-bell"></i> Notifikasi aktif untuk peringatan kualitas air &amp; koneksi
+        </footer>
+    </main>
+
+    <!-- ===== CREW MODAL ===== -->
+    <div id="crew-modal-backdrop" class="crew-modal-backdrop" aria-hidden="true">
+        <div class="crew-modal" role="dialog" aria-modal="true" aria-labelledby="crew-modal-name">
+            <button class="crew-modal-close" id="crew-modal-close" aria-label="Tutup">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="crew-modal-portrait">
+                <img id="crew-modal-img" class="crew-modal-portrait-img" src="" alt="">
+                <div class="crew-modal-scanlines"></div>
+                <div class="crew-modal-scanbeam"></div>
+                <span class="crew-modal-frame-tag"><i class="fa-solid fa-id-badge"></i> Crew Profile</span>
+            </div>
+            <div class="crew-modal-body">
+                <span id="crew-modal-role" class="badge badge-aqua crew-modal-role">
+                    <i class="fa-solid fa-anchor"></i> Role
+                </span>
+                <h3 id="crew-modal-name" class="crew-modal-name">Nama Anggota</h3>
+                <div class="crew-modal-badge-line">
+                    <span id="crew-modal-badge" class="badge badge-neutral">Divisi</span>
+                </div>
+                <div class="crew-modal-hairline"></div>
+                <div class="crew-modal-field">
+                    <i class="fa-solid fa-phone"></i>
+                    <div>
+                        <div class="lbl">No. Telepon</div>
+                        <div id="crew-modal-phone" class="val">—</div>
+                    </div>
+                </div>
+                <div class="crew-modal-field">
+                    <i class="fa-solid fa-align-left"></i>
+                    <div>
+                        <div class="lbl">Tentang</div>
+                        <p id="crew-modal-desc" class="crew-modal-desc">—</p>
+                    </div>
+                </div>
+                <div class="crew-modal-footer-tag">
+                    <i class="fa-solid fa-droplet"></i> KELOMPOK 3 Dive Crew
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <!-- ===== MAIN JAVASCRIPT ===== -->
+    <script>
+        // ================== KONFIGURASI FIREBASE ==================
+        /*
+         * FIREBASE CONFIG
+         * Ganti databaseURL di bawah dengan URL Realtime Database milikmu.
+         * Contoh:
+         * https://nama-project-default-rtdb.asia-southeast1.firebasedatabase.app
+         */
+        const firebaseConfig = {
+            databaseURL: "https://water-dispenser-1bd04-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // ================== BOOT SEQUENCE ==================
+        (function runBootSequence() {
+            document.documentElement.classList.add('booting');
+            const screen = document.getElementById('boot-screen');
+            const fill = document.getElementById('boot-progress-fill');
+            const logEl = document.getElementById('boot-log');
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            function finishBoot() {
+                document.documentElement.classList.remove('booting');
+                document.body.classList.add('dashboard-ready');
+                if (screen) setTimeout(() => screen.remove(), 750);
+            }
+
+            if (reduce || !screen) {
+                if (screen) screen.remove();
+                document.documentElement.classList.remove('booting');
+                document.body.classList.add('dashboard-ready');
+                return;
+            }
+
+            const lines = [
+                'Menginisialisasi konsol Dashboard…',
+                'Memeriksa sensor HC-SR04…',
+                'Mengkalibrasi turbidity…',
+                'Membuka uplink Firebase…',
+                'Siap.'
+            ];
+
+            let i = 0;
+
+            function nextLine() {
+                if (i < lines.length) {
+                    const row = document.createElement('div');
+                    const isLast = i === lines.length - 1;
+                    row.innerText = (isLast ? '✓ ' : '› ') + lines[i];
+                    if (isLast) row.classList.add('ok');
+                    logEl.appendChild(row);
+                    fill.style.width = Math.round(((i + 1) / lines.length) * 100) + '%';
+                    i++;
+                    setTimeout(nextLine, 380);
+                } else {
+                    setTimeout(() => {
+                        screen.classList.add('boot-hide');
+                        finishBoot();
+                    }, 420);
+                }
+            }
+
+            setTimeout(nextLine, 350);
+        })();
+
+        // ================== SYSTEM OPENING ==================
+        (function initSystemOpening() {
+            const opening = document.getElementById('systemOpening');
+            if (!opening) return;
+
+            const closeOpening = () => {
+                if (opening.classList.contains('hide')) return;
+                opening.classList.add('hide');
+            };
+
+            // Simpan elemen opening di DOM agar bisa diputar ulang saat
+            // perintah "tutup dashboard" dijalankan.
+            window.replaySystemOpening = function () {
+                const current = document.getElementById('systemOpening');
+                if (!current) return;
+
+                // Jangan mengganti elemen opening karena elemen hasil clone dapat
+                // menangkap klik dan membuat tombol mikrofon terasa tidak bisa ditekan.
+                // Reset animasi pada elemen yang sama agar event listener tetap aman.
+                current.classList.remove('hide');
+                current.style.pointerEvents = 'auto';
+                current.style.zIndex = '99999';
+
+                // Restart seluruh animasi CSS dari awal.
+                current.querySelectorAll('*').forEach(el => {
+                    el.style.animation = 'none';
+                    void el.offsetWidth;
+                    el.style.animation = '';
+                });
+
+                const closeFresh = () => {
+                    current.classList.add('hide');
+                    current.style.pointerEvents = 'none';
+                    current.style.zIndex = '-1';
+                };
+
+                window.setTimeout(closeFresh, 3100);
+                current.addEventListener('click', closeFresh, { once: true });
+            };
+
+            window.setTimeout(closeOpening, 3100);
+            opening.addEventListener('click', closeOpening, { once: true });
+            window.addEventListener('keydown', closeOpening, { once: true });
+        })();
+
+        // ================== UTILITY FUNCTIONS ==================
+        function flip3D(el, mutate) {
+            // Nama fungsi dipertahankan agar bagian Firebase yang sudah ada tetap kompatibel.
+            if (typeof mutate === 'function') mutate();
+        }
+
+        function animateNumber(el, val, dec = 1) {
+            const cur = parseFloat(el.innerText);
+            const target = parseFloat(val);
+            if (isNaN(cur) || isNaN(target)) {
+                el.innerText = val;
+                return;
+            }
+            el.classList.remove('flash');
+            void el.offsetWidth;
+            el.classList.add('flash');
+            const dur = 600;
+            const start = performance.now();
+            const from = cur;
+            const diff = target - from;
+
+            function step(now) {
+                const prog = Math.min((now - start) / dur, 1);
+                const eased = 1 - Math.pow(1 - prog, 3);
+                el.innerText = (from + diff * eased).toFixed(dec);
+                if (prog < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    el.innerText = target.toFixed(dec);
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        function setNumber(el, val, dec) {
+            animateNumber(el, val, dec);
+        }
+
+        function touchUpdated() {
+            const hudUpdated = document.getElementById('hud-updated');
+            if (hudUpdated) {
+                hudUpdated.innerText = new Date().toLocaleTimeString();
+            }
+        }
+
+        // ================== TOAST NOTIFICATIONS ==================
+        function showToast(title, msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let icon, color, bar;
+            if (type === 'error') {
+                icon = 'fa-circle-xmark';
+                color = 'text-[var(--coral)]';
+                bar = 'var(--coral)';
+            } else if (type === 'warning') {
+                icon = 'fa-triangle-exclamation';
+                color = 'text-[var(--amber)]';
+                bar = 'var(--amber)';
+            } else if (type === 'success') {
+                icon = 'fa-circle-check';
+                color = 'text-[var(--kelp)]';
+                bar = 'var(--kelp)';
+            } else {
+                icon = 'fa-bell';
+                color = 'text-[var(--aqua)]';
+                bar = 'var(--aqua)';
+            }
+
+            toast.className = 'toast p-4 pl-5 flex items-start gap-3 transform transition-all duration-500 translate-x-[120%] opacity-0';
+            toast.innerHTML = `
+                <div class="toast-bar" style="background:${bar}"></div>
+                <div class="flex-shrink-0 mt-0.5"><i class="fa-solid ${icon} ${color}"></i></div>
+                <div class="flex-1">
+                    <h4 class="font-semibold text-[var(--foam)] text-sm font-display">${title}</h4>
+                    <p class="text-xs text-[var(--mist)] mt-0.5">${msg}</p>
+                </div>
+                <button class="text-[var(--mist)] hover:text-[var(--foam)]" onclick="this.parentElement.remove()">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>`;
+
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-x-[120%]', 'opacity-0'), 50);
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.add('translate-x-[120%]', 'opacity-0');
+                    setTimeout(() => toast.remove(), 400);
+                }
+            }, 4500);
+        }
+
+        function testNotification() {
+            showToast('Uji Notifikasi', 'Fitur notifikasi berfungsi.', 'info');
+        }
+
+        // ================== CREW MODAL ==================
+        (function initCrewModal() {
+            const backdrop = document.getElementById('crew-modal-backdrop');
+            const closeBtn = document.getElementById('crew-modal-close');
+            const imgEl = document.getElementById('crew-modal-img');
+            const nameEl = document.getElementById('crew-modal-name');
+            const roleEl = document.getElementById('crew-modal-role');
+            const badgeEl = document.getElementById('crew-modal-badge');
+            const phoneEl = document.getElementById('crew-modal-phone');
+            const descEl = document.getElementById('crew-modal-desc');
+            let lastFocused = null;
+
+            function openCrewModal(card) {
+                lastFocused = document.activeElement;
+                imgEl.src = card.dataset.img || '';
+                imgEl.alt = 'Foto ' + (card.dataset.name || '');
+                nameEl.innerText = card.dataset.name || '—';
+                roleEl.innerHTML = '<i class="fa-solid fa-anchor"></i> ' + (card.dataset.role || '—');
+                badgeEl.innerText = card.dataset.badge || '—';
+                phoneEl.innerText = card.dataset.phone || '—';
+                descEl.innerText = card.dataset.desc || '';
+                backdrop.classList.add('open');
+                backdrop.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+                closeBtn.focus();
+            }
+
+            function closeCrewModal() {
+                backdrop.classList.remove('open');
+                backdrop.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+                if (lastFocused) lastFocused.focus();
+            }
+
+            document.querySelectorAll('.crew-card').forEach(card => {
+                card.addEventListener('click', () => openCrewModal(card));
+                card.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openCrewModal(card);
+                    }
+                });
+            });
+
+            closeBtn.addEventListener('click', closeCrewModal);
+            backdrop.addEventListener('click', e => {
+                if (e.target === backdrop) closeCrewModal();
+            });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && backdrop.classList.contains('open')) closeCrewModal();
+            });
+        })();
+
+        // ================== VOICE ASSISTANT (perintah suara) ==================
+        (function initVoiceAssistant() {
+            const dashboardRoot = document.getElementById('dashboard-root');
+            const voiceGate = document.getElementById('voice-gate');
+            const voiceWidget = document.getElementById('voice-widget');
+            const gateMicBtn = document.getElementById('voice-mic-btn');
+            const widgetMicBtn = document.getElementById('voice-widget-btn');
+            const gateStatusLine = document.getElementById('voice-status-line');
+            const widgetTranscript = document.getElementById('voice-widget-transcript');
+            const gateChatForm = document.getElementById('assistant-chat-form');
+            const gateChatInput = document.getElementById('assistant-chat-input');
+            const widgetChatForm = document.getElementById('voice-widget-chat-form');
+            const widgetChatInput = document.getElementById('voice-widget-chat-input');
+            const crewPanelBody = document.getElementById('crew-panel-body');
+            const crewLockNotice = document.getElementById('crew-lock-notice');
+            const crewSection = crewPanelBody ? crewPanelBody.closest('.panel') : null;
+
+            const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            let recognition = null;
+            let voiceSilenceTimer = null;
+            const VOICE_SILENCE_DELAY = 450;
+
+            let wantsListening = false; // user's intent: keep mic on
+            let dashboardOpen = false;
+            let crewOpen = false;
+
+            // ---- Perintah yang dikenali (bisa ditambah kapan saja) ----
+            const COMMANDS = [
+                { action: 'open-dashboard', phrases: ['dashboard'] },
+                { action: 'close-dashboard', phrases: ['tutup dashboard', 'tutup dasbor'] },
+                { action: 'open-crew', phrases: ['anggota'] },
+                { action: 'close-crew', phrases: ['tutup anggota'] },
+                { action: 'open-turbidity', phrases: ['turbidity', 'kekeruhan'] },
+                { action: 'open-pump', phrases: ['pompa'] },
+                { action: 'open-water-quality', phrases: ['kualitas'] },
+                { action: 'open-connection', phrases: ['koneksi', 'esp8266'] },
+                { action: 'open-level', phrases: ['level'] },
+                { action: 'open-dashboard', phrases: ['buka dashboard', 'buka dashboardnya', 'tampilkan dashboard', 'buka layar utama', 'buka layar dashboard', 'buka tampilan dashboard'] },
+                { action: 'close-dashboard', phrases: ['sembunyikan dashboard', 'kunci dashboard'] },
+                { action: 'open-crew', phrases: ['buka anggota kelompok', 'buka data anggota', 'buka anggota', 'tampilkan anggota', 'buka profil anggota', 'buka anggota tim', 'buka data kelompok', 'buka kru'] },
+                { action: 'open-turbidity', phrases: ['buka turbidity', 'buka nilai turbidity', 'tampilkan turbidity', 'tampilkan nilai turbidity', 'lihat turbidity', 'lihat nilai turbidity', 'cek turbidity', 'cek nilai turbidity', 'buka kekeruhan air', 'tampilkan kekeruhan air', 'lihat kekeruhan air'] },
+                { action: 'open-pump', phrases: ['buka pompa', 'buka status pompa', 'tampilkan pompa', 'tampilkan status pompa', 'lihat pompa', 'lihat status pompa', 'cek pompa', 'cek status pompa', 'buka status pompa air', 'tampilkan status pompa air'] },
+                { action: 'open-water-quality', phrases: ['buka kualitas air', 'tampilkan kualitas air', 'lihat kualitas air', 'cek kualitas air', 'buka status kualitas air', 'tampilkan status kualitas air'] },
+                { action: 'open-connection', phrases: ['buka koneksi esp8266', 'buka koneksi esp', 'tampilkan koneksi esp8266', 'tampilkan koneksi esp', 'lihat koneksi esp8266', 'cek koneksi esp8266', 'cek koneksi esp', 'buka status koneksi', 'tampilkan status koneksi'] },
+                { action: 'open-level', phrases: ['buka level air', 'tampilkan level air', 'lihat level air', 'cek level air', 'buka ketinggian air', 'tampilkan ketinggian air'] }
+            ];
+            function normalize(text) {
+                return String(text || '').toLowerCase().normalize('NFKD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+                    .replace(/\s+/g, ' ').trim();
+            }
+
+            function findMemberCard(nameText) {
+                const wanted = normalize(nameText);
+                if (!wanted) return null;
+                const cards = Array.from(document.querySelectorAll('.crew-card[data-name]'));
+                let card = cards.find(c => normalize(c.dataset.name) === wanted);
+                if (card) return card;
+                card = cards.find(c => normalize(c.dataset.name).includes(wanted));
+                if (card) return card;
+                return cards.find(c => normalize(c.dataset.name).split(' ')[0] === wanted) || null;
+            }
+
+            function matchCommand(rawText) {
+                const text = normalize(rawText);
+                if (!text) return null;
+
+                // Nama anggota menjadi command otomatis: "agip", "abiam", "gilbert", dst.
+                const cards = Array.from(document.querySelectorAll('.crew-card[data-name]'));
+                for (const card of cards) {
+                    const fullName = normalize(card.dataset.name || '');
+                    const firstName = fullName.split(' ')[0];
+                    if (!firstName) continue;
+
+                    if (text === firstName || text === fullName) {
+                        return { action: 'open-member', memberName: card.dataset.name, phrase: text };
+                    }
+
+                    const prefixes = ['buka anggota ', 'tampilkan anggota ', 'lihat anggota ', 'profil ', 'buka '];
+                    for (const prefix of prefixes) {
+                        if (text.startsWith(prefix)) {
+                            const target = findMemberCard(text.slice(prefix.length));
+                            if (target) return { action: 'open-member', memberName: target.dataset.name, phrase: text };
+                        }
+                    }
+                }
+
+                // Utamakan kecocokan tepat untuk command pendek.
+                for (const cmd of COMMANDS) {
+                    for (const phrase of cmd.phrases) {
+                        if (text === normalize(phrase)) return { action: cmd.action, phrase: normalize(phrase) };
+                    }
+                }
+
+                // Tetap mendukung kalimat command lama.
+                for (const cmd of COMMANDS) {
+                    for (const phrase of cmd.phrases) {
+                        if (text.includes(normalize(phrase))) return { action: cmd.action, phrase: normalize(phrase) };
+                    }
+                }
+                return null;
+            }
+
+            function processVoiceCommandFast(rawText) {
+                const matched = matchCommand(rawText);
+                if (matched) executeCommand(matched.action, true, matched);
+                return matched;
+            }
+
+function executeCommand(action, fromVoice, commandData) {
+                if (action === 'open-member') return openSpecificMember(commandData && commandData.memberName ? commandData.memberName : '');
+                switch (action) {
+                    case 'open-dashboard': openDashboard(!!fromVoice); return true;
+                    case 'close-dashboard': closeDashboard(); return true;
+                    case 'open-crew': openCrew(!!fromVoice); return true;
+                    case 'close-crew': closeCrew(); return true;
+                    default: return executeExtendedCommand(action);
+                }
+            }
+
+            function setGateStatus(text, recognized) {
+                if (!gateStatusLine) return;
+                gateStatusLine.innerText = text;
+                gateStatusLine.classList.toggle('recognized', !!recognized);
+            }
+
+            function setWidgetTranscript(text) {
+                if (widgetTranscript) widgetTranscript.innerText = text;
+            }
+
+            function setListeningUI(isListening) {
+                if (gateMicBtn) {
+                    gateMicBtn.classList.toggle('listening', isListening);
+                    gateMicBtn.setAttribute('aria-pressed', String(isListening));
+                }
+                if (widgetMicBtn) {
+                    widgetMicBtn.classList.toggle('listening', isListening);
+                    widgetMicBtn.setAttribute('aria-pressed', String(isListening));
+                }
+                if (!dashboardOpen) {
+                    setGateStatus(isListening ? 'Mendengarkan… silakan ucapkan perintah.' : 'Mikrofon nonaktif. Ketuk untuk mengaktifkan.');
+                } else {
+                    setWidgetTranscript(isListening ? 'Mendengarkan…' : 'Ketuk untuk bicara');
+                }
+            }
+
+
+            function scrollToDashboardText(labels) {
+                const candidates = Array.from(document.querySelectorAll(
+                    '#dashboard-root .panel, #dashboard-root section, #dashboard-root .card'
+                ));
+                const wanted = labels.map(normalize);
+                const target = candidates.find(el => {
+                    const content = normalize(el.innerText || '');
+                    return wanted.some(label => content.includes(label));
+                });
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    target.classList.add('crew-just-opened');
+                    setTimeout(() => target.classList.remove('crew-just-opened'), 1800);
+                    return true;
+                }
+                return false;
+            }
+
+            function openSpecificMember(name) {
+                if (!dashboardOpen) openDashboard(true);
+                const card = findMemberCard(name);
+                if (!card) {
+                    showToast('Anggota Tidak Ditemukan', 'Data anggota "' + name + '" belum ditemukan.', 'warning');
+                    return false;
+                }
+                card.click();
+                showToast('Anggota ' + card.dataset.name, 'Profil anggota ditampilkan.', 'success');
+                return true;
+            }
+
+            function executeExtendedCommand(action) {
+                if (!dashboardOpen) openDashboard(true);
+
+                switch (action) {
+                    case 'open-turbidity':
+                        scrollToDashboardText(['turbidity', 'kekeruhan']);
+                        showToast('Nilai Turbidity', 'Menampilkan nilai turbidity.', 'success');
+                        break;
+                    case 'open-pump':
+                        scrollToDashboardText(['pompa otomatis', 'status pompa', 'pompa']);
+                        showToast('Status Pompa', 'Menampilkan status pompa air.', 'success');
+                        break;
+                    case 'open-water-quality':
+                        scrollToDashboardText(['kualitas air']);
+                        showToast('Kualitas Air', 'Menampilkan status kualitas air.', 'success');
+                        break;
+                    case 'open-connection':
+                        scrollToDashboardText(['koneksi esp8266', 'koneksi esp', 'esp8266']);
+                        showToast('Koneksi ESP8266', 'Menampilkan status koneksi.', 'success');
+                        break;
+                    case 'open-level':
+                        scrollToDashboardText(['level air', 'ketinggian air']);
+                        showToast('Level Air', 'Menampilkan level air.', 'success');
+                        break;
+                    default:
+                        return false;
+                }
+                return true;
+            }
+
+            function openDashboard(fromVoice) {
+                if (dashboardOpen) return;
+                dashboardOpen = true;
+                dashboardRoot.classList.remove('dashboard-locked');
+                voiceGate.classList.add('gate-hide');
+                voiceWidget.classList.add('widget-show');
+                // Jangan hapus voice gate; elemen ini dipakai lagi saat dashboard di-reset.
+                showToast('Dashboard Terbuka', fromVoice ? 'Dibuka melalui perintah suara.' : 'Dashboard telah dibuka.', 'success');
+            }
+
+            function closeDashboard() {
+                // Hentikan mikrofon terlebih dahulu supaya recognition tidak terus
+                // berjalan ketika dashboard dikembalikan ke kondisi awal.
+                wantsListening = false;
+                if (recognition) {
+                    try { recognition.stop(); } catch (e) {}
+                }
+                setListeningUI(false);
+
+                // Jika dashboard sudah tertutup, tetap jalankan reset opening agar
+                // perintah "tutup dashboard" selalu mengembalikan tampilan awal.
+                dashboardOpen = false;
+                dashboardRoot.classList.add('dashboard-locked');
+                voiceWidget.classList.remove('widget-show');
+
+                // Kembalikan bagian anggota/modal ke kondisi awal.
+                crewOpen = false;
+                if (crewPanelBody) crewPanelBody.classList.add('crew-locked');
+                if (crewLockNotice) crewLockNotice.classList.add('show');
+                const crewBackdrop = document.getElementById('crew-modal-backdrop');
+                if (crewBackdrop) {
+                    crewBackdrop.classList.remove('open');
+                    crewBackdrop.setAttribute('aria-hidden', 'true');
+                }
+                document.body.style.overflow = '';
+
+                // Tampilkan kembali voice gate seperti kondisi pertama kali halaman dibuka.
+                if (voiceGate) voiceGate.classList.remove('gate-hide');
+
+                // Putar ulang opening dari awal. Setelah selesai, pengguna kembali berada
+                // di voice gate dan harus memberi perintah untuk membuka dashboard.
+                if (typeof window.replaySystemOpening === 'function') {
+                    window.replaySystemOpening();
+                }
+
+                showToast('Kembali ke Opening', 'Dashboard dikembalikan ke setelan awal.', 'info');
+            }
+
+            function openCrew(fromVoice) {
+                if (!dashboardOpen) openDashboard(fromVoice);
+                if (crewOpen) return;
+                crewOpen = true;
+                if (crewPanelBody) crewPanelBody.classList.remove('crew-locked');
+                if (crewLockNotice) crewLockNotice.classList.remove('show');
+                showToast('Anggota Kelompok Terbuka', fromVoice ? 'Dibuka melalui perintah suara.' : 'Data anggota ditampilkan.', 'success');
+                if (crewSection) {
+                    crewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    crewSection.classList.add('crew-just-opened');
+                    setTimeout(() => crewSection.classList.remove('crew-just-opened'), 2900);
+                }
+            }
+
+            function closeCrew() {
+                if (!crewOpen) return;
+                crewOpen = false;
+                if (crewPanelBody) crewPanelBody.classList.add('crew-locked');
+                if (crewLockNotice) crewLockNotice.classList.add('show');
+                showToast('Anggota Kelompok Ditutup', 'Ucapkan "buka anggota kelompok" untuk membukanya kembali.', 'info');
+            }
+
+            function handleTranscript(rawText) {
+                const match = matchCommand(rawText);
+                if (!dashboardOpen) {
+                    setGateStatus('Terdengar: "' + rawText + '"', !!match);
+                } else {
+                    setWidgetTranscript(rawText);
+                }
+                if (!match) return;
+
+                executeCommand(match.action, true, match);
+            }
+
+            function handleChatSubmit(inputEl) {
+                if (!inputEl) return;
+                const rawText = inputEl.value.trim();
+                if (!rawText) return;
+
+                // Chat memakai parser dan daftar COMMANDS yang sama persis dengan audio.
+                const match = matchCommand(rawText);
+                if (match) {
+                    if (!dashboardOpen) {
+                        setGateStatus('Perintah: "' + rawText + '"', true);
+                    } else {
+                        setWidgetTranscript(rawText);
+                    }
+                    handleTranscript(rawText);
+                } else {
+                    if (!dashboardOpen) {
+                        setGateStatus('Perintah belum dikenali: "' + rawText + '"', false);
+                    } else {
+                        setWidgetTranscript('Perintah belum dikenali: "' + rawText + '"');
+                    }
+                    showToast(
+                        'Perintah Tidak Dikenali',
+                        'Gunakan perintah yang tersedia di daftar asisten.',
+                        'warning'
+                    );
+                }
+
+                inputEl.value = '';
+            }
+
+            function buildRecognition() {
+                const rec = new SpeechRecognitionCtor();
+                rec.lang = 'id-ID';
+                rec.continuous = true;
+                rec.interimResults = false;
+                rec.maxAlternatives = 1;
+
+                rec.onresult = (event) => {
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const result = event.results[i];
+                        if (result.isFinal) {
+                            const text = result[0].transcript.trim();
+                            if (text) handleTranscript(text);
+                        }
+                    }
+                };
+
+                rec.onerror = (event) => {
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        wantsListening = false;
+                        setListeningUI(false);
+                        showToast('Akses Mikrofon Ditolak', 'Izinkan akses mikrofon di browser untuk menggunakan asisten suara.', 'error');
+                    } else if (event.error === 'no-speech' || event.error === 'audio-capture') {
+                        // diamkan, akan restart otomatis lewat onend
+                    } else {
+                        showToast('Kesalahan Mikrofon', 'Terjadi kendala: ' + event.error, 'warning');
+                    }
+                };
+
+                rec.onend = () => {
+                    if (wantsListening) {
+                        try {
+                            rec.start();
+                        } catch (e) {
+                            // recognition mungkin masih dalam proses stop, coba lagi sebentar
+                            setTimeout(() => { if (wantsListening) { try { rec.start(); } catch (e2) {} } }, 250);
+                        }
+                    } else {
+                        setListeningUI(false);
+                    }
+                };
+
+                return rec;
+            }
+
+            function startListening() {
+                if (!SpeechRecognitionCtor) {
+                    setGateStatus('Browser ini tidak mendukung pengenalan suara. Gunakan Chrome di desktop/Android.', false);
+                    showToast('Tidak Didukung', 'Browser ini tidak mendukung Web Speech API. Coba gunakan Chrome.', 'error');
+                    return;
+                }
+                if (!recognition) recognition = buildRecognition();
+                wantsListening = true;
+                setListeningUI(true);
+                try {
+                    recognition.start();
+                } catch (e) {
+                    // sudah berjalan, abaikan
+                }
+            }
+
+            function stopListening() {
+                wantsListening = false;
+                setListeningUI(false);
+                if (recognition) {
+                    try { recognition.stop(); } catch (e) {}
+                }
+            }
+
+            function toggleListening() {
+                if (wantsListening) stopListening();
+                else startListening();
+            }
+
+            if (gateMicBtn) gateMicBtn.addEventListener('click', toggleListening);
+            if (widgetMicBtn) widgetMicBtn.addEventListener('click', toggleListening);
+
+            if (gateChatForm) {
+                gateChatForm.addEventListener('submit', e => {
+                    e.preventDefault();
+                    handleChatSubmit(gateChatInput);
+                });
+            }
+
+            if (widgetChatForm) {
+                widgetChatForm.addEventListener('submit', e => {
+                    e.preventDefault();
+                    handleChatSubmit(widgetChatInput);
+                });
+            }
+
+            if (!SpeechRecognitionCtor) {
+                setGateStatus('Browser ini tidak mendukung pengenalan suara. Gunakan Chrome di desktop/Android.', false);
+            }
+
+            // Ekspos beberapa fungsi untuk debugging manual dari console jika diperlukan.
+            window.voiceAssistant = {
+                openDashboard: () => openDashboard(false),
+                closeDashboard,
+                openCrew: () => openCrew(false),
+                closeCrew,
+                startListening,
+                stopListening,
+                simulateCommand: handleTranscript
+            };
+        })();
+
+        // ================== FIREBASE LISTENERS ==================
+        let espTimer;
+        let isOnline = false;
+        let turbidityWarnSent = false;
+        let glassWarnSent = false;
+
+        const connDot = document.getElementById('conn-dot');
+        const connStatusText = document.getElementById('conn-status-text');
+        const connChecking = document.getElementById('conn-checking');
+        const connCheckingDetail = document.getElementById('conn-checking-detail');
+        const connCheckingText = document.getElementById('conn-checking-text');
+        const signalBars = document.querySelectorAll('.signal-bar');
+
+        function showChecking() {
+            if (connCheckingDetail) connCheckingDetail.style.opacity = '1';
+        }
+
+        function hideChecking() {
+            if (connCheckingDetail) connCheckingDetail.style.opacity = '0';
+        }
+
+        function setEspOffline() {
+            if (isOnline) showToast('Koneksi Terputus!', 'ESP8266 berhenti mengirim data.', 'error');
+            isOnline = false;
+            if (connDot) {
+                connDot.classList.remove('pulse');
+                connDot.style.background = 'var(--coral)';
+                connDot.style.color = 'var(--coral)';
+            }
+            if (connStatusText) connStatusText.innerText = 'TERPUTUS';
+            if (connChecking) {
+                connChecking.className = 'badge badge-coral';
+                connChecking.innerText = 'OFFLINE';
+            }
+            signalBars.forEach(bar => bar.classList.remove('active'));
+            hideChecking();
+        }
+
+        function setEspOnline() {
+            if (!isOnline) {
+                showToast('Perangkat Terhubung', 'ESP8266 aktif dan mengirim data.', 'success');
+                isOnline = true;
+            }
+            if (connDot) {
+                connDot.classList.add('pulse');
+                connDot.style.background = 'var(--aqua)';
+                connDot.style.color = 'var(--aqua)';
+            }
+            if (connStatusText) connStatusText.innerText = 'TERHUBUNG';
+            if (connChecking) {
+                connChecking.className = 'badge badge-aqua';
+                connChecking.innerText = 'ONLINE';
+            }
+            signalBars.forEach((bar, i) => {
+                if (i < 3) bar.classList.add('active');
+                else bar.classList.remove('active');
+            });
+            hideChecking();
+        }
+
+        // Firebase connection listeners
+        firebase.database().ref('.info/connected').on('value', snap => {
+            if (!snap.val()) setEspOffline();
+        });
+
+        db.ref('/status/uptime').on('value', snap => {
+            if (snap.val() !== null) {
+                setEspOnline();
+                touchUpdated();
+                clearTimeout(espTimer);
+                espTimer = setTimeout(setEspOffline, 12000);
+            }
+        });
+
+        const testConnBtn = document.getElementById('test-conn-btn');
+        if (testConnBtn) {
+            testConnBtn.addEventListener('click', function() {
+                showChecking();
+                if (connCheckingText) connCheckingText.innerText = 'Memeriksa koneksi…';
+                firebase.database().ref('.info/connected').once('value').then(snap => {
+                    if (snap.val() === true) {
+                        if (connCheckingText) connCheckingText.innerText = 'Terhubung ke Firebase ✓';
+                        setEspOnline();
+                    } else {
+                        if (connCheckingText) connCheckingText.innerText = 'Tidak dapat terhubung ke Firebase ✗';
+                        setEspOffline();
+                    }
+                    setTimeout(hideChecking, 2000);
+                }).catch(err => {
+                    if (connCheckingText) connCheckingText.innerText = 'Error: ' + err.message;
+                    setEspOffline();
+                    setTimeout(hideChecking, 2000);
+                });
+            });
+        }
+
+        // ================== SENSOR LISTENERS ==================
+        const turbidityEl = document.getElementById('turbidity-value');
+        const turbidityEl2 = document.getElementById('turbidity-value-2');
+        const turbidityMeterFill = document.getElementById('turbidity-meter-fill');
+        const turbidityStatusEl = document.getElementById('turbidity-status');
+        const waterQualityLabelEl = document.getElementById('water-quality-label');
+        const waterQualityEl = document.getElementById('water-quality');
+        const cupWater = document.getElementById('cup-water');
+        const levelEl = document.getElementById('level-value');
+        const distanceGaugeFill = document.getElementById('distance-gauge-fill');
+        const distanceStatusEl = document.getElementById('distance-status');
+        const glassStatusEl = document.getElementById('glass-status');
+        const glassStatusEl2 = document.getElementById('glass-status-2');
+        const pourRig = document.getElementById('pour-rig');
+        const pompaStatusText = document.getElementById('pompa-status-text');
+        const pompaIconBg = document.getElementById('pompa-icon-bg');
+
+        // Turbidity listener
+        db.ref('/sensor/turbidity').on('value', s => {
+            const val = s.val();
+            if (val === null) return;
+            setNumber(turbidityEl, val, 0);
+            setNumber(turbidityEl2, val, 0);
+            touchUpdated();
+
+            const threshold = 600;
+            const pct = Math.max(0, Math.min(1, val / 1023));
+            if (turbidityMeterFill) turbidityMeterFill.style.width = (pct * 100).toFixed(1) + '%';
+
+            if (val > threshold) {
+                if (turbidityMeterFill) turbidityMeterFill.style.background = 'var(--coral)';
+                if (turbidityStatusEl && turbidityStatusEl.dataset.state !== 'keruh') {
+                    flip3D(turbidityStatusEl, () => {
+                        turbidityStatusEl.className = 'badge badge-coral flip3d-el';
+                        turbidityStatusEl.innerText = 'Air Keruh';
+                    });
+                    turbidityStatusEl.dataset.state = 'keruh';
+                }
+                const stateText = document.getElementById('turbidity-state-text');
+                if (stateText) stateText.innerText = 'Air keruh';
+                if (waterQualityLabelEl) waterQualityLabelEl.innerText = 'Keruh';
+                if (waterQualityEl) {
+                    waterQualityEl.className = 'badge badge-coral';
+                    waterQualityEl.innerText = 'Keruh';
+                }
+                if (cupWater) cupWater.classList.add('murky');
+                if (!turbidityWarnSent) {
+                    showToast('Peringatan Air Keruh!', `Nilai ADC ${val}.`, 'warning');
+                    turbidityWarnSent = true;
+                }
+            } else {
+                if (turbidityMeterFill) turbidityMeterFill.style.background = 'linear-gradient(90deg, var(--aqua), #56f0dc)';
+                if (turbidityStatusEl && turbidityStatusEl.dataset.state !== 'jernih') {
+                    flip3D(turbidityStatusEl, () => {
+                        turbidityStatusEl.className = 'badge badge-aqua flip3d-el';
+                        turbidityStatusEl.innerText = 'Air Jernih';
+                    });
+                    turbidityStatusEl.dataset.state = 'jernih';
+                }
+                const stateText = document.getElementById('turbidity-state-text');
+                if (stateText) stateText.innerText = 'Air jernih';
+                if (waterQualityLabelEl) waterQualityLabelEl.innerText = 'Jernih';
+                if (waterQualityEl) {
+                    waterQualityEl.className = 'badge badge-aqua';
+                    waterQualityEl.innerText = 'Jernih';
+                }
+                if (cupWater) cupWater.classList.remove('murky');
+                turbidityWarnSent = false;
+            }
+        });
+
+        // Distance sensor listener
+        db.ref('/sensor/jarak').on('value', s => {
+            const dist = s.val();
+            if (dist === null) return;
+            if (levelEl) setNumber(levelEl, dist, 1);
+            touchUpdated();
+
+            const max = 20;
+            const closeness = Math.max(0, Math.min(1, 1 - dist / max));
+            if (distanceGaugeFill) {
+                const GAUGE_ARC = 263;
+                distanceGaugeFill.style.strokeDashoffset = GAUGE_ARC * (1 - closeness);
+            }
+
+            const glassThreshold = 10;
+            if (dist < glassThreshold) {
+                if (distanceGaugeFill) distanceGaugeFill.style.stroke = 'var(--kelp)';
+                if (distanceStatusEl && distanceStatusEl.dataset.state !== 'ada') {
+                    flip3D(distanceStatusEl, () => {
+                        distanceStatusEl.className = 'badge badge-kelp hidden sm:inline-flex flip3d-el';
+                        distanceStatusEl.innerText = 'Gelas Terdeteksi';
+                    });
+                    distanceStatusEl.dataset.state = 'ada';
+                }
+                if (!glassWarnSent) glassWarnSent = true;
+            } else {
+                if (distanceGaugeFill) distanceGaugeFill.style.stroke = 'var(--aqua)';
+                if (distanceStatusEl && distanceStatusEl.dataset.state !== 'tidak') {
+                    flip3D(distanceStatusEl, () => {
+                        distanceStatusEl.className = 'badge badge-neutral hidden sm:inline-flex flip3d-el';
+                        distanceStatusEl.innerText = 'Tidak Ada Gelas';
+                    });
+                    distanceStatusEl.dataset.state = 'tidak';
+                }
+                glassWarnSent = false;
+            }
+        });
+
+        // Pump status listener
+        db.ref('/status/pompa').on('value', snap => {
+            const st = snap.val();
+            if (st !== null) updatePompaUI(st === 'ON');
+        });
+
+        // Glass status listener
+        db.ref('/status/gelas').on('value', snap => {
+            const g = snap.val();
+            if (g === null) return;
+            const label = g ? 'Ada' : 'Tidak Ada';
+            const cls = g ? 'badge badge-kelp flip3d-el' : 'badge badge-neutral flip3d-el';
+            if (glassStatusEl && glassStatusEl.dataset.state !== String(g)) {
+                flip3D(glassStatusEl, () => {
+                    glassStatusEl.className = cls;
+                    glassStatusEl.innerText = label;
+                });
+                glassStatusEl.dataset.state = String(g);
+            }
+            if (glassStatusEl2) {
+                glassStatusEl2.className = cls.replace(' flip3d-el', '');
+                glassStatusEl2.innerText = label;
+            }
+            if (pourRig) pourRig.classList.toggle('ready', !!g);
+        });
+
+        function updatePompaUI(on) {
+            const mutate = () => {
+                if (on) {
+                    if (pompaStatusText) {
+                        pompaStatusText.innerText = 'STATUS: ON';
+                        pompaStatusText.style.color = 'var(--kelp)';
+                    }
+                    if (pompaIconBg) pompaIconBg.classList.add('on');
+                    if (pourRig) pourRig.classList.add('pouring');
+                    if (cupWater) cupWater.style.height = '78%';
+                } else {
+                    if (pompaStatusText) {
+                        pompaStatusText.innerText = 'STATUS: OFF';
+                        pompaStatusText.style.color = 'var(--foam)';
+                    }
+                    if (pompaIconBg) pompaIconBg.classList.remove('on');
+                    if (pourRig) pourRig.classList.remove('pouring');
+                    if (cupWater) cupWater.style.height = '8%';
+                }
+            };
+
+            if (pompaStatusText && pompaStatusText.dataset.state !== String(on)) {
+                flip3D(pompaStatusText, mutate);
+                pompaStatusText.dataset.state = String(on);
+            } else {
+                mutate();
+            }
+        }
+    
+
+        // ================== CHAT ASSISTANT ==================
+        (function initAssistantChat() {
+            const chat = document.getElementById('assistant-chat');
+            const toggle = document.getElementById('assistant-chat-toggle');
+            const close = document.getElementById('assistant-chat-close');
+            const form = document.getElementById('assistant-widget-chat-form');
+            const input = document.getElementById('assistant-widget-chat-input');
+            const messages = document.getElementById('assistant-chat-messages');
+
+            if (!chat || !toggle || !form || !input || !messages) return;
+
+            function addChatMessage(message, who) {
+                const el = document.createElement('div');
+                el.className = 'assistant-msg ' + who;
+                el.innerText = message;
+                messages.appendChild(el);
+                messages.scrollTop = messages.scrollHeight;
+            }
+
+            function responseForAction(action, memberName) {
+                const responses = {
+                    'open-dashboard': 'Dashboard dibuka.',
+                    'close-dashboard': 'Dashboard ditutup.',
+                    'open-crew': 'Bagian anggota kelompok dibuka.',
+                    'close-crew': 'Bagian anggota kelompok ditutup.',
+                    'open-turbidity': 'Nilai turbidity ditampilkan.',
+                    'open-pump': 'Status pompa air ditampilkan.',
+                    'open-water-quality': 'Status kualitas air ditampilkan.',
+                    'open-connection': 'Status koneksi ESP8266 ditampilkan.',
+                    'open-level': 'Level air ditampilkan.',
+                    'open-member': 'Profil anggota ' + (memberName || '') + ' ditampilkan.'
+                };
+                return responses[action] || 'Perintah berhasil dijalankan.';
+            }
+
+            function submitChatCommand(raw) {
+                const command = normalize(raw);
+                if (!command) return;
+
+                addChatMessage(raw, 'user');
+
+                const matched = matchCommand(command);
+                if (!matched) {
+                    addChatMessage(
+                        'Perintah tidak dikenali. Gunakan perintah yang sama seperti pada Asisten Suara.',
+                        'bot'
+                    );
+                    return;
+                }
+
+                // EXACT SAME command dispatcher used by voice.
+                executeCommand(matched.action, false, matched);
+                addChatMessage(responseForAction(matched.action, matched.memberName), 'bot');
+            }
+
+            toggle.addEventListener('click', () => {
+                chat.classList.toggle('chat-show');
+                if (chat.classList.contains('chat-show')) input.focus();
+            });
+
+            close.addEventListener('click', () => chat.classList.remove('chat-show'));
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                submitChatCommand(input.value);
+                input.value = '';
+                input.focus();
+            });
+        })();
+
+</script>
+
+</body>
+</html>
