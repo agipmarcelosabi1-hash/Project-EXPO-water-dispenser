@@ -3966,6 +3966,50 @@
                 return labeledDescriptors;
             }
 
+
+            function showFaceWelcome(memberName) {
+                const welcome = document.getElementById('face-welcome');
+                const nameEl = document.getElementById('face-welcome-name');
+                const roleEl = document.getElementById('face-welcome-role');
+                const textEl = document.getElementById('face-welcome-text');
+                const imgEl = document.getElementById('face-welcome-img');
+
+                const card = Array.from(document.querySelectorAll('.crew-card[data-name]'))
+                    .find(c => c.dataset.name === memberName);
+                if (!welcome || !nameEl || !roleEl || !textEl || !imgEl || !card) {
+                    window.selectedAuthMethod = 'face';
+                    if (window.voiceAssistant && typeof window.voiceAssistant.openDashboard === 'function') {
+                        window.voiceAssistant.openDashboard();
+                    }
+                    return;
+                }
+
+                const firstName = String(memberName).trim().split(/\\s+/)[0] || memberName;
+                const role = card.dataset.role || 'Anggota Kelompok';
+                const image = card.dataset.img || '';
+
+                imgEl.src = image;
+                imgEl.alt = 'Foto ' + memberName;
+                nameEl.innerText = 'Selamat datang, ' + firstName + '!';
+                roleEl.innerText = role;
+                textEl.innerText = 'Halo ' + firstName + ', Face ID berhasil mengenali kamu. Dashboard Water Dispenser siap digunakan.';
+                welcome.classList.add('show');
+                welcome.setAttribute('aria-hidden', 'false');
+
+                // Beri waktu singkat agar sambutan terbaca sebelum dashboard dibuka.
+                setTimeout(() => {
+                    welcome.classList.remove('show');
+                    welcome.setAttribute('aria-hidden', 'true');
+                    window.selectedAuthMethod = 'face';
+                    if (window.voiceAssistant && typeof window.voiceAssistant.openDashboard === 'function') {
+                        window.voiceAssistant.openDashboard();
+                    } else if (dashboardRoot && voiceGate) {
+                        dashboardRoot.classList.remove('dashboard-locked');
+                        voiceGate.classList.add('gate-hide');
+                    }
+                }, 1900);
+            }
+
             async function prepareFaceRecognition() {
                 setStatus('Memuat model Face ID…');
                 await loadModels();
@@ -4055,16 +4099,8 @@
                         setStatus('Wajah dikenali. Akses diberikan.', 'ok');
                         stopCamera(false);
 
-                        setTimeout(() => {
-                            window.selectedAuthMethod = 'face';
-                            if (window.voiceAssistant &&
-                                typeof window.voiceAssistant.openDashboard === 'function') {
-                                window.voiceAssistant.openDashboard();
-                            } else if (dashboardRoot && voiceGate) {
-                                dashboardRoot.classList.remove('dashboard-locked');
-                                voiceGate.classList.add('gate-hide');
-                            }
-                        }, 650);
+                        // Sambutan personal hanya untuk akses melalui Face ID.
+                        showFaceWelcome(best.label);
                         return;
                     }
 
