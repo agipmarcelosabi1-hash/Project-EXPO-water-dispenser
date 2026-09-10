@@ -4107,6 +4107,481 @@ body::after {
 }
 </style>
 
+
+<style id="member-login-themes">
+/* ============================================================
+   MEMBER LOGIN THEMES
+   Only applied after successful Face ID login.
+   Voice login always uses the default theme.
+   ============================================================ */
+:root {
+  --member-bg-a: #bfd4c0;
+  --member-bg-b: #d3e2d0;
+  --member-card: #dce9d8;
+  --member-card-strong: #d5e4d1;
+  --member-border: #91ae8d;
+  --member-accent: #4e7f55;
+  --member-accent-soft: #b8d0b8;
+  --member-text: #284c31;
+}
+
+body {
+  background:
+    linear-gradient(180deg, var(--member-bg-a) 0%, var(--member-bg-b) 100%) !important;
+}
+
+body::before {
+  opacity: .22 !important;
+}
+
+body::after {
+  opacity: .42 !important;
+  background:
+    radial-gradient(circle at 15% 15%, color-mix(in srgb, var(--member-accent) 14%, transparent), transparent 24%),
+    radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--member-accent-soft) 22%, transparent), transparent 26%),
+    radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--member-accent) 10%, transparent), transparent 28%) !important;
+}
+
+.panel,
+.turbidity-card,
+.crew-card,
+.toast,
+.crew-modal,
+.assistant-chat,
+.assistant-widget,
+.conn-pill {
+  background-color: var(--member-card) !important;
+  border-color: var(--member-border) !important;
+  color: var(--member-text) !important;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--member-accent) 12%, transparent) !important;
+}
+
+.crew-card,
+.turbidity-card {
+  background-color: var(--member-card-strong) !important;
+}
+
+.panel-eyebrow,
+.crew-role,
+.hud-item .k,
+.crew-nim,
+.turbidity-unit,
+.turbidity-footer,
+.auth-choice-note {
+  color: color-mix(in srgb, var(--member-text) 74%, white) !important;
+}
+
+.panel-eyebrow::before,
+.crew-role,
+.turbidity-footer i {
+  color: var(--member-accent) !important;
+}
+
+.headline-grad {
+  background: linear-gradient(105deg, var(--member-text) 10%, var(--member-accent) 68%, var(--member-accent-soft) 100%) !important;
+}
+
+.brand-mark {
+  background: var(--member-accent-soft) !important;
+  border-color: var(--member-border) !important;
+  color: var(--member-accent) !important;
+}
+
+.pump-ring.on {
+  border-color: var(--member-accent) !important;
+  color: var(--member-accent) !important;
+  background: color-mix(in srgb, var(--member-accent-soft) 70%, white) !important;
+}
+
+.cup-inner { background: color-mix(in srgb, var(--member-card) 88%, white) !important; }
+.cup-water { background: var(--member-accent) !important; }
+
+/* --- AGIP : blue -> purple --- */
+body.member-theme-agip {
+  --member-bg-a: #b9cad9;
+  --member-bg-b: #d7d1e4;
+  --member-card: #dfe1ee;
+  --member-card-strong: #d6d8e7;
+  --member-border: #9196b6;
+  --member-accent: #5f6cb4;
+  --member-accent-soft: #b7b7da;
+  --member-text: #35416d;
+}
+
+/* --- ABIAM : ocean blue --- */
+body.member-theme-abiam {
+  --member-bg-a: #b6d7df;
+  --member-bg-b: #d4e5e8;
+  --member-card: #deedf0;
+  --member-card-strong: #d5e7ea;
+  --member-border: #88aeb8;
+  --member-accent: #4e8ca0;
+  --member-accent-soft: #acd1da;
+  --member-text: #315d6d;
+}
+
+/* --- CINDY : kawaii pink scrapbook / girly --- */
+body.member-theme-cindy {
+  --member-bg-a: #ef8fba;
+  --member-bg-b: #f5a3c5;
+  --member-card: #dc5b91;
+  --member-card-strong: #e66b9f;
+  --member-border: #f7c4da;
+  --member-accent: #8f235c;
+  --member-accent-soft: #ffd4e5;
+  --member-text: #5a2440;
+}
+
+/* Cindy-only visual language: saturated pink scrapbook, hearts, sparkles, cherry-blossom accents.
+   Layout, component dimensions, DOM structure and all dashboard functions remain unchanged. */
+body.member-theme-cindy {
+  background:
+    radial-gradient(circle at 8% 12%, rgba(255,255,255,.34) 0 2px, transparent 3px),
+    radial-gradient(circle at 16% 76%, rgba(255,245,250,.30) 0 2px, transparent 3px),
+    radial-gradient(circle at 85% 18%, rgba(255,255,255,.32) 0 2px, transparent 3px),
+    radial-gradient(circle at 92% 82%, rgba(255,245,250,.24) 0 2px, transparent 3px),
+    linear-gradient(160deg, #ef8fba 0%, #f39bc0 45%, #e984b2 100%) !important;
+}
+
+body.member-theme-cindy::before {
+  opacity: .9 !important;
+  background-image:
+    linear-gradient(rgba(255,246,251,.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,246,251,.10) 1px, transparent 1px) !important;
+  background-size: 52px 52px !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
+
+body.member-theme-cindy::after {
+  opacity: .95 !important;
+  background:
+    radial-gradient(circle at 10% 16%, rgba(255,222,236,.28), transparent 18%),
+    radial-gradient(circle at 88% 14%, rgba(255,218,233,.30), transparent 17%),
+    radial-gradient(circle at 72% 88%, rgba(255,236,245,.22), transparent 20%) !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+body.member-theme-cindy .panel,
+body.member-theme-cindy .turbidity-card,
+body.member-theme-cindy .crew-card,
+body.member-theme-cindy .toast,
+body.member-theme-cindy .crew-modal,
+body.member-theme-cindy .assistant-chat,
+body.member-theme-cindy .assistant-widget,
+body.member-theme-cindy .conn-pill {
+  background-color: var(--member-card) !important;
+  border: 2px solid var(--member-border) !important;
+  color: #fff4f8 !important;
+  box-shadow: 0 10px 22px rgba(125, 31, 77, .12) !important;
+}
+
+body.member-theme-cindy .crew-card,
+body.member-theme-cindy .turbidity-card {
+  background-color: var(--member-card-strong) !important;
+}
+
+body.member-theme-cindy .panel:hover,
+body.member-theme-cindy .crew-card:hover,
+body.member-theme-cindy .turbidity-card:hover {
+  border-color: #ffe4ef !important;
+  box-shadow: 0 12px 28px rgba(125, 31, 77, .16) !important;
+}
+
+/* Fixed decorative scrapbook details: no scroll/parallax movement. */
+body.member-theme-cindy .panel::after,
+body.member-theme-cindy .crew-card::after,
+body.member-theme-cindy .turbidity-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: .9;
+  background:
+    radial-gradient(circle at 9% 14%, #ffd8e8 0 2px, transparent 3px),
+    radial-gradient(circle at 15% 8%, #fff1f7 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 90% 16%, #ffd5e6 0 2px, transparent 3px),
+    radial-gradient(circle at 84% 10%, #fff3f8 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 7% 87%, #f9c0d8 0 2px, transparent 3px),
+    radial-gradient(circle at 94% 90%, #ffe4ef 0 2px, transparent 3px),
+    radial-gradient(circle at 48% 96%, rgba(255,245,250,.22) 0 1.5px, transparent 2.5px);
+}
+
+body.member-theme-cindy .panel > *,
+body.member-theme-cindy .crew-card > *,
+body.member-theme-cindy .turbidity-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+body.member-theme-cindy .panel-eyebrow,
+body.member-theme-cindy .crew-role,
+body.member-theme-cindy .hud-item .k,
+body.member-theme-cindy .crew-nim,
+body.member-theme-cindy .turbidity-unit,
+body.member-theme-cindy .turbidity-footer,
+body.member-theme-cindy .auth-choice-note {
+  color: #ffe3ef !important;
+}
+
+body.member-theme-cindy .panel-eyebrow::before,
+body.member-theme-cindy .crew-role,
+body.member-theme-cindy .turbidity-footer i {
+  color: #fff3f8 !important;
+}
+
+body.member-theme-cindy .headline-grad {
+  background: linear-gradient(105deg, #fff7fb 0%, #ffd6e8 48%, #8f235c 100%) !important;
+}
+
+body.member-theme-cindy .brand-mark {
+  background: #f7b5cf !important;
+  border-color: #ffe0ed !important;
+  color: #9a2f64 !important;
+  box-shadow: none !important;
+}
+
+body.member-theme-cindy .pump-ring.on {
+  border-color: #ffe0ed !important;
+  color: #fff4f8 !important;
+  background: #c94a82 !important;
+}
+
+body.member-theme-cindy .cup-inner { background: #f1b0c9 !important; }
+body.member-theme-cindy .cup-water { background: #b93772 !important; }
+
+/* Extra tiny pink-heart accents inspired by the reference. */
+body.member-theme-cindy .crew-card:nth-child(1)::before,
+body.member-theme-cindy .crew-card:nth-child(4)::before {
+  background:
+    radial-gradient(circle at 94% 8%, #ffe9f2 0 4px, transparent 4.5px),
+    radial-gradient(circle at 90% 8%, #ffe9f2 0 4px, transparent 4.5px) !important;
+}
+
+body.member-theme-cindy .crew-avatar {
+  border: 3px solid #ffdbe9 !important;
+  box-shadow: 0 0 0 4px rgba(255,223,236,.20) !important;
+}
+
+/* --- GILBERT : warm honey / spring gold --- */
+body.member-theme-gilbert {
+  --member-bg-a: #d5d0ae;
+  --member-bg-b: #e7dfc3;
+  --member-card: #ebe6ca;
+  --member-card-strong: #e7e0bd;
+  --member-border: #b9ad76;
+  --member-accent: #8a7b38;
+  --member-accent-soft: #d1c58b;
+  --member-text: #5d562d;
+}
+
+/* --- TIRZHA : lavender --- */
+body.member-theme-tirzha {
+  --member-bg-a: #cbbfda;
+  --member-bg-b: #ded6e8;
+  --member-card: #e5ddeb;
+  --member-card-strong: #ddd4e7;
+  --member-border: #a695b8;
+  --member-accent: #80649c;
+  --member-accent-soft: #c0add2;
+  --member-text: #56436b;
+}
+
+/* --- ADVENTCYA : peach / mint --- */
+body.member-theme-adventcya {
+  --member-bg-a: #d8ceb8;
+  --member-bg-b: #d6e1cf;
+  --member-card: #e8e5d5;
+  --member-card-strong: #dfe8d8;
+  --member-border: #a4b28e;
+  --member-accent: #6f8d63;
+  --member-accent-soft: #d8b49f;
+  --member-text: #4e6246;
+}
+
+/* Keep opening/auth untouched. Theme activates only while dashboard is unlocked. */
+body:not(.member-theme-agip):not(.member-theme-abiam):not(.member-theme-cindy):not(.member-theme-gilbert):not(.member-theme-tirzha):not(.member-theme-adventcya) {
+  --member-bg-a: #b5cdb0;
+  --member-bg-b: #c9dcc3;
+  --member-card: #cbe3c7;
+  --member-card-strong: #c4ddc0;
+  --member-border: #87aa82;
+  --member-accent: #5e8b60;
+  --member-accent-soft: #bfd7ba;
+  --member-text: #315d35;
+}
+</style>
+
+
+<style id="tirzha-cute-botanical-theme">
+/* ============================================================
+   TIRZHA — cute botanical collage theme inspired by reference
+   Applied ONLY after Face ID recognizes Tirzha.
+   Layout/DOM/function remain unchanged.
+   ============================================================ */
+body.member-theme-tirzha {
+  --member-bg-a: #a9bf79;
+  --member-bg-b: #c3d493;
+  --member-card: #b9cc8a;
+  --member-card-strong: #aec37e;
+  --member-border: #687a3b;
+  --member-accent: #4d6428;
+  --member-accent-soft: #d7e7a7;
+  --member-text: #30431c;
+
+  background:
+    radial-gradient(circle at 8% 14%, rgba(247,240,194,.34) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 86% 9%, rgba(247,240,194,.30) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 93% 78%, rgba(247,240,194,.22) 0 1.5px, transparent 2.5px),
+    linear-gradient(180deg,#afc480 0%,#b9cd8b 45%,#c7d89b 100%) !important;
+  background-attachment: fixed;
+}
+
+/* quiet botanical collage: vines + grid + meadow texture */
+body.member-theme-tirzha::before {
+  opacity: .82 !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='300' viewBox='0 0 520 300'%3E%3Cg fill='none' stroke='%234f672b' stroke-opacity='.34' stroke-width='3'%3E%3Cpath d='M12 294C29 219 55 148 104 74'/%3E%3Cpath d='M507 298C489 222 463 148 416 74'/%3E%3Cpath d='M98 78C72 54 62 30 63 5'/%3E%3Cpath d='M422 78C448 54 458 30 457 5'/%3E%3C/g%3E%3Cg fill='%234f6e2b' fill-opacity='.42'%3E%3Cellipse cx='63' cy='16' rx='20' ry='8' transform='rotate(20 63 16)'/%3E%3Cellipse cx='87' cy='42' rx='20' ry='8' transform='rotate(-26 87 42)'/%3E%3Cellipse cx='112' cy='67' rx='19' ry='8' transform='rotate(24 112 67)'/%3E%3Cellipse cx='457' cy='16' rx='20' ry='8' transform='rotate(-20 457 16)'/%3E%3Cellipse cx='433' cy='42' rx='20' ry='8' transform='rotate(26 433 42)'/%3E%3Cellipse cx='408' cy='67' rx='19' ry='8' transform='rotate(-24 408 67)'/%3E%3C/g%3E%3Cg fill='%237d9349' fill-opacity='.25'%3E%3Cellipse cx='26' cy='242' rx='24' ry='9' transform='rotate(16 26 242)'/%3E%3Cellipse cx='492' cy='246' rx='24' ry='9' transform='rotate(-16 492 246)'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(rgba(77,98,41,.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77,98,41,.13) 1px, transparent 1px) !important;
+  background-size: 520px 300px, 54px 54px, 54px 54px !important;
+  background-position: left top, right bottom, right bottom !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
+
+body.member-theme-tirzha::after {
+  opacity: .72 !important;
+  background:
+    radial-gradient(circle at 14% 77%, rgba(242,231,177,.38) 0 2px, transparent 3px),
+    radial-gradient(circle at 22% 83%, rgba(242,231,177,.28) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 84% 19%, rgba(242,231,177,.32) 0 2px, transparent 3px),
+    radial-gradient(circle at 77% 26%, rgba(242,231,177,.22) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 52% 92%, rgba(93,113,48,.10), transparent 28%) !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+/* cards: pale olive green, dark olive edging, small fixed foliage corners */
+body.member-theme-tirzha .panel,
+body.member-theme-tirzha .turbidity-card,
+body.member-theme-tirzha .crew-card,
+body.member-theme-tirzha .toast,
+body.member-theme-tirzha .crew-modal,
+body.member-theme-tirzha .assistant-chat,
+body.member-theme-tirzha .assistant-widget,
+body.member-theme-tirzha .conn-pill {
+  background: #bdd08e !important;
+  border: 2px solid #6c7d40 !important;
+  color: #30431c !important;
+  box-shadow: 0 8px 18px rgba(64,80,31,.13) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.member-theme-tirzha .crew-card,
+body.member-theme-tirzha .turbidity-card {
+  background: #b6c987 !important;
+}
+
+body.member-theme-tirzha .panel::before,
+body.member-theme-tirzha .crew-card::before,
+body.member-theme-tirzha .turbidity-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='170' viewBox='0 0 250 170'%3E%3Cg fill='none' stroke='%234d6428' stroke-opacity='.24' stroke-width='2'%3E%3Cpath d='M4 166C15 129 29 91 49 57'/%3E%3Cpath d='M246 166C235 130 221 91 201 58'/%3E%3C/g%3E%3Cg fill='%234d6428' fill-opacity='.30'%3E%3Cellipse cx='30' cy='66' rx='13' ry='6' transform='rotate(-25 30 66)'/%3E%3Cellipse cx='47' cy='46' rx='14' ry='6' transform='rotate(24 47 46)'/%3E%3Cellipse cx='211' cy='65' rx='13' ry='6' transform='rotate(25 211 65)'/%3E%3Cellipse cx='198' cy='44' rx='14' ry='6' transform='rotate(-25 198 44)'/%3E%3Cellipse cx='62' cy='95' rx='10' ry='5' transform='rotate(-28 62 95)'/%3E%3Cellipse cx='188' cy='96' rx='10' ry='5' transform='rotate(28 188 96)'/%3E%3C/g%3E%3C/svg%3E") left top/250px 170px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='210' height='145' viewBox='0 0 210 145'%3E%3Cg fill='none' stroke='%2353702d' stroke-opacity='.22' stroke-width='2'%3E%3Cpath d='M204 141C188 108 180 80 165 36'/%3E%3C/g%3E%3Cg fill='%235a7b31' fill-opacity='.22'%3E%3Cellipse cx='173' cy='46' rx='13' ry='6' transform='rotate(22 173 46)'/%3E%3Cellipse cx='161' cy='64' rx='12' ry='5' transform='rotate(-25 161 64)'/%3E%3Cellipse cx='188' cy='83' rx='13' ry='6' transform='rotate(28 188 83)'/%3E%3C/g%3E%3C/svg%3E") right bottom/210px 145px no-repeat;
+}
+
+body.member-theme-tirzha .panel > *,
+body.member-theme-tirzha .crew-card > *,
+body.member-theme-tirzha .turbidity-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.member-theme-tirzha .panel-eyebrow,
+body.member-theme-tirzha .crew-role,
+body.member-theme-tirzha .hud-item .k,
+body.member-theme-tirzha .crew-nim,
+body.member-theme-tirzha .turbidity-unit,
+body.member-theme-tirzha .turbidity-footer,
+body.member-theme-tirzha .auth-choice-note {
+  color: #587038 !important;
+}
+
+body.member-theme-tirzha .panel-eyebrow::before,
+body.member-theme-tirzha .crew-role,
+body.member-theme-tirzha .turbidity-footer i {
+  color: #476226 !important;
+}
+
+body.member-theme-tirzha .headline-grad {
+  background: linear-gradient(105deg,#30431c 0%,#5d7a34 70%,#907a42 100%) !important;
+}
+
+body.member-theme-tirzha .brand-mark {
+  background: #d7e6a8 !important;
+  color: #4a6526 !important;
+  border-color: #81964d !important;
+  box-shadow: none !important;
+}
+
+body.member-theme-tirzha .pump-ring.on {
+  border-color: #5a7630 !important;
+  color: #4f6f2b !important;
+  background: #d7e5aa !important;
+  box-shadow: 0 0 0 3px rgba(93,117,49,.10) !important;
+}
+
+body.member-theme-tirzha .cup-inner { background: #bfd395 !important; }
+body.member-theme-tirzha .cup-water { background: #719340 !important; }
+
+body.member-theme-tirzha .crew-avatar {
+  border: 3px solid #dce9b5 !important;
+  box-shadow: 0 0 0 3px rgba(91,112,49,.14) !important;
+}
+
+/* tiny floral accents, fixed so they never jump during scroll */
+body.member-theme-tirzha .crew-card:nth-child(2)::after,
+body.member-theme-tirzha .crew-card:nth-child(5)::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 9px;
+  width: 34px;
+  height: 34px;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    radial-gradient(circle at 50% 50%, #6e7f37 0 3px, transparent 3.5px),
+    radial-gradient(circle at 50% 18%, #e9dc93 0 5px, transparent 5.5px),
+    radial-gradient(circle at 82% 42%, #d7c875 0 5px, transparent 5.5px),
+    radial-gradient(circle at 18% 42%, #d7c875 0 5px, transparent 5.5px),
+    radial-gradient(circle at 50% 80%, #e2d687 0 5px, transparent 5.5px);
+  opacity: .82;
+}
+
+/* No parallax / no scroll-reactive movement in Tirzha theme. */
+body.member-theme-tirzha .data-orbit,
+body.member-theme-tirzha .ambient-field,
+body.member-theme-tirzha .iot-particles,
+body.member-theme-tirzha .sonar-background {
+  animation: none !important;
+}
+
+body.member-theme-tirzha .ambient-field::before,
+body.member-theme-tirzha .ambient-field::after {
+  animation: none !important;
+}
+</style>
+
 </head>
 
 <body class="antialiased pb-16">
@@ -5512,9 +5987,48 @@ function executeCommand(action, fromVoice, commandData) {
                 return true;
             }
 
+            function clearMemberTheme() {
+                document.body.classList.remove(
+                    'member-theme-agip',
+                    'member-theme-abiam',
+                    'member-theme-cindy',
+                    'member-theme-gilbert',
+                    'member-theme-tirzha',
+                    'member-theme-adventcya'
+                );
+                window.currentFaceMember = null;
+            }
+
+            function memberThemeClass(name) {
+                const key = normalize(name).split(' ')[0];
+                const map = {
+                    agip: 'member-theme-agip',
+                    abiam: 'member-theme-abiam',
+                    cindy: 'member-theme-cindy',
+                    gilbert: 'member-theme-gilbert',
+                    tirzha: 'member-theme-tirzha',
+                    adventcya: 'member-theme-adventcya'
+                };
+                return map[key] || null;
+            }
+
+            function applyMemberTheme(memberName) {
+                clearMemberTheme();
+                const themeClass = memberThemeClass(memberName);
+                if (themeClass) {
+                    document.body.classList.add(themeClass);
+                    window.currentFaceMember = memberName;
+                }
+            }
+
             function openDashboard(fromVoice) {
                 if (dashboardOpen) return;
                 const method = fromVoice ? 'voice' : (window.selectedAuthMethod || 'manual');
+                if (method === 'face') {
+                    applyMemberTheme(window.currentFaceMember || '');
+                } else {
+                    clearMemberTheme();
+                }
                 dashboardOpen = true;
                 dashboardRoot.classList.remove('dashboard-locked');
                 voiceGate.classList.add('gate-hide');
@@ -5540,6 +6054,7 @@ function executeCommand(action, fromVoice, commandData) {
                 // Jika dashboard sudah tertutup, tetap jalankan reset opening agar
                 // perintah "tutup dashboard" selalu mengembalikan tampilan awal.
                 dashboardOpen = false;
+                clearMemberTheme();
                 dashboardRoot.classList.add('dashboard-locked');
                 voiceWidget.classList.remove('widget-show');
 
@@ -5680,6 +6195,7 @@ function executeCommand(action, fromVoice, commandData) {
 
             function startListening() {
                 window.selectedAuthMethod = 'voice';
+                clearMemberTheme();
                 if (!SpeechRecognitionCtor) {
                     setGateStatus('Browser ini tidak mendukung pengenalan suara. Gunakan Chrome di desktop/Android.', false);
                     showToast('Tidak Didukung', 'Browser ini tidak mendukung Web Speech API. Coba gunakan Chrome.', 'error');
