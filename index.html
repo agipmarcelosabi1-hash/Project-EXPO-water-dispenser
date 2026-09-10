@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" style="background:#020a12;">
+<html lang="id" style="background:#f8fcf9;">
 <head>
     <!-- 3D visual effects disabled: 2D UI, glare, opening, sparkline, and Firebase behavior retained. -->
     <meta charset="UTF-8">
@@ -22,20 +22,20 @@
            CSS VARIABLES & RESET
            ============================================================ */
         :root {
-            --abyss: #10231a;
-            --depth: #18382a;
-            --surface: rgba(27, 61, 45, 0.76);
-            --surface-2: rgba(34, 78, 57, 0.92);
-            --stroke: rgba(173, 211, 188, 0.18);
-            --stroke-strong: rgba(193, 231, 205, 0.36);
-            --foam: #fff8f2;
-            --mist: #b7c9bd;
-            --aqua: #78c895;
-            --aqua-dim: rgba(120, 200, 149, 0.14);
-            --violet: #f3a8bd;
-            --amber: #f3c47b;
-            --coral: #e98fa7;
-            --kelp: #9bd7ae;
+            --abyss: #f4fbf6;
+            --depth: #e6f6eb;
+            --surface: rgba(232, 243, 236, 0.94);
+            --surface-2: rgba(248, 255, 250, 0.97);
+            --stroke: rgba(54, 145, 82, 0.18);
+            --stroke-strong: rgba(45, 132, 70, 0.36);
+            --foam: #173a23;
+            --mist: #617968;
+            --aqua: #36a35c;
+            --aqua-dim: rgba(54, 163, 92, 0.12);
+            --violet: #f2a6bb;
+            --amber: #e7a93e;
+            --coral: #e47f9b;
+            --kelp: #43b86b;
         }
 
         * {
@@ -53,10 +53,10 @@
             color: var(--foam);
             font-family: 'Inter', sans-serif;
             background:
-                radial-gradient(circle at 15% 15%, rgba(120, 200, 149, 0.10), transparent 28%),
-                radial-gradient(circle at 85% 30%, rgba(243, 168, 189, 0.08), transparent 30%),
-                radial-gradient(circle at 50% 100%, rgba(120, 200, 149, 0.07), transparent 35%),
-                linear-gradient(135deg, #0b1f16 0%, #163a2a 45%, #10261b 100%);
+                radial-gradient(circle at 15% 15%, rgba(54, 163, 92, 0.12), transparent 28%),
+                radial-gradient(circle at 85% 30%, rgba(242, 166, 187, 0.10), transparent 30%),
+                radial-gradient(circle at 50% 100%, rgba(54, 163, 92, 0.08), transparent 35%),
+                linear-gradient(135deg, #f8fcf9 0%, #edf8f0 45%, #ffffff 100%);
             overflow-x: hidden;
             position: relative;
         }
@@ -71,8 +71,8 @@
             z-index: -5;
             pointer-events: none;
             background-image:
-                linear-gradient(rgba(120, 200, 149, 0.035) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(120, 200, 149, 0.035) 1px, transparent 1px);
+                linear-gradient(rgba(54, 163, 92, 0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(54, 163, 92, 0.045) 1px, transparent 1px);
             background-size: 55px 55px;
             mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.35));
             -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.35));
@@ -89,7 +89,7 @@
                 radial-gradient(circle at 80% 20%, rgba(243, 168, 189, 0.10), transparent 18%),
                 radial-gradient(circle at 50% 80%, rgba(120, 200, 149, 0.08), transparent 25%);
             filter: blur(20px);
-            animation: oceanGlow 12s ease-in-out infinite alternate;
+            animation: none;
         }
 
         @keyframes oceanGlow {
@@ -165,7 +165,7 @@
             box-shadow:
                 0 0 80px rgba(120, 200, 149, 0.04),
                 inset 0 0 80px rgba(120, 200, 149, 0.03);
-            animation: sonarRotate 18s linear infinite;
+            animation: none;
         }
 
         .sonar-background::before,
@@ -191,6 +191,36 @@
         }
 
         /* ============================================================
+           BRIGHT GREEN + SOFT PINK THEME
+           ============================================================ */
+        body { color: var(--foam); }
+
+        .panel, .toast, .crew-modal {
+            background: var(--surface);
+            box-shadow: 0 14px 34px -24px rgba(45, 115, 67, 0.22);
+        }
+
+        .topbar { background: rgba(255, 255, 255, 0.93); }
+
+        .crew-card { background: rgba(243, 251, 245, 0.94); }
+        .crew-card:hover { background: rgba(234, 248, 238, 0.99); }
+
+        .badge-neutral {
+            background: rgba(97, 121, 104, 0.10);
+            color: #587060;
+        }
+
+        .cup-inner { background: rgba(248, 255, 250, 0.82); }
+
+        #systemOpening {
+            background:
+                radial-gradient(circle at 50% 50%, rgba(54, 163, 92, 0.13), transparent 18%),
+                radial-gradient(circle at 50% 50%, rgba(242, 166, 187, 0.11), transparent 34%),
+                #f4fbf6;
+            color: var(--foam);
+        }
+
+        /* ============================================================
            TYPOGRAPHY
            ============================================================ */
         .font-display {
@@ -209,8 +239,8 @@
             background: var(--surface);
             border: 1px solid var(--stroke);
             border-radius: 20px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             box-shadow: 0 16px 40px -24px rgba(0, 0, 0, 0.6);
             position: relative;
         }
@@ -237,8 +267,8 @@
 
         /* Topbar */
         .topbar {
-            background: rgba(3, 12, 19, 0.72);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(6px);
             border-bottom: 1px solid var(--stroke);
         }
 
@@ -253,7 +283,7 @@
             justify-content: center;
             color: var(--aqua);
             box-shadow: 0 0 16px rgba(120, 200, 149, 0.25), inset 0 0 10px rgba(120, 200, 149, 0.12);
-            animation: brandBreathe 4s ease-in-out infinite;
+            animation: none;
         }
 
         @keyframes brandBreathe {
@@ -448,7 +478,7 @@
             width: 48px;
             height: 19px;
             border-radius: 0 0 11px 11px;
-            background: linear-gradient(180deg, var(--surface-2), rgba(7, 28, 43, 0.95));
+            background: linear-gradient(180deg, var(--surface-2), rgba(229, 245, 233, 0.98));
             border: 1px solid var(--stroke-strong);
             border-top: none;
         }
@@ -537,7 +567,7 @@
             position: absolute;
             inset: 3px;
             clip-path: polygon(18.2% 4.2%, 81.8% 4.2%, 69.3% 94.5%, 30.7% 94.5%);
-            background: rgba(3, 12, 19, 0.65);
+            background: rgba(249, 255, 251, 0.95);
             overflow: hidden;
         }
 
@@ -639,7 +669,7 @@
             border-radius: 50%;
             background: radial-gradient(ellipse, rgba(0, 0, 0, 0.4), transparent 70%);
             transform: translateX(-50%);
-            animation: shadowBreathe 7s ease-in-out infinite;
+            animation: none;
         }
 
         @keyframes shadowBreathe {
@@ -664,7 +694,7 @@
             border: 1px solid rgba(120, 200, 149, 0.2);
             opacity: 0;
             pointer-events: none;
-            animation: idlePing 5s ease-out infinite;
+            animation: none;
         }
 
         @keyframes idlePing {
@@ -852,7 +882,7 @@
             background: var(--surface);
             border: 1px solid var(--stroke);
             border-radius: 14px;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(6px);
             box-shadow: 0 16px 40px -20px rgba(0, 0, 0, 0.7);
             position: relative;
             overflow: hidden;
@@ -876,7 +906,7 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            animation: gradFlow 8s ease-in-out infinite;
+            animation: none;
         }
 
         @keyframes gradFlow {
@@ -920,7 +950,7 @@
             height: 80px;
             top: -120px;
             background: linear-gradient(180deg, transparent, rgba(120, 200, 149, 0.06), transparent);
-            animation: scanSweep 7s ease-in-out infinite;
+            animation: none;
             pointer-events: none;
         }
 
@@ -943,7 +973,7 @@
         }
 
         .crew-card {
-            background: rgba(14, 45, 66, 0.45);
+            background: rgba(240, 250, 243, 0.94);
             border: 1px solid var(--stroke);
             border-radius: 16px;
             padding: 1.5rem 1rem;
@@ -1100,7 +1130,7 @@
             position: fixed;
             inset: 0;
             z-index: 200;
-            background: rgba(3, 9, 15, 0.72);
+            background: rgba(231, 246, 236, 0.80);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             display: flex;
@@ -1202,7 +1232,7 @@
             letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--aqua);
-            background: rgba(3, 12, 19, 0.55);
+            background: rgba(255, 255, 255, 0.94);
             border: 1px solid rgba(120, 200, 149, 0.3);
             padding: 0.25rem 0.55rem;
             border-radius: 999px;
@@ -1222,7 +1252,7 @@
             width: 34px;
             height: 34px;
             border-radius: 50%;
-            background: rgba(3, 12, 19, 0.55);
+            background: rgba(255, 255, 255, 0.94);
             border: 1px solid var(--stroke-strong);
             color: var(--foam);
             display: flex;
@@ -1342,7 +1372,7 @@
             align-items: center;
             justify-content: center;
             gap: 1.6rem;
-            background: var(--abyss);
+            background: #d7e9dc;
             transition: opacity 0.7s ease, visibility 0.7s ease;
         }
 
@@ -1614,9 +1644,9 @@
             place-items: center;
             overflow: hidden;
             background:
-                radial-gradient(circle at 50% 50%, rgba(120, 200, 149, 0.10), transparent 18%),
-                radial-gradient(circle at 50% 50%, rgba(243, 168, 189, 0.06), transparent 34%),
-                #0d2117;
+                radial-gradient(circle at 50% 50%, rgba(54, 163, 92, 0.12), transparent 18%),
+                radial-gradient(circle at 50% 50%, rgba(242, 166, 187, 0.08), transparent 34%),
+                #f4fbf6;
             color: #eaf7f8;
             transition: opacity 0.65s ease, visibility 0.65s ease;
         }
@@ -1633,8 +1663,8 @@
             inset: 0;
             opacity: 0.24;
             background-image:
-                linear-gradient(rgba(120, 200, 149, 0.035) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(120, 200, 149, 0.035) 1px, transparent 1px);
+                linear-gradient(rgba(54, 163, 92, 0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(54, 163, 92, 0.045) 1px, transparent 1px);
             background-size: 56px 56px;
         }
 
@@ -1971,7 +2001,7 @@
             height: 720px;
             right: -390px;
             top: 18%;
-            box-shadow: 0 0 90px rgba(120, 200, 149, 0.035);
+            box-shadow: 0 0 90px rgba(54, 163, 92, 0.045);
             animation: orbitSpin 32s linear infinite;
         }
 
@@ -1997,7 +2027,7 @@
             background:
                 radial-gradient(circle at 12% 12%, rgba(120, 200, 149, 0.08), transparent 24%),
                 radial-gradient(circle at 88% 24%, rgba(243, 168, 189, 0.065), transparent 25%),
-                linear-gradient(135deg, #0b1f16 0%, #031521 48%, #10261b 100%) !important;
+                linear-gradient(135deg, #0b1f16 0%, #edf8f0 48%, #10261b 100%) !important;
             background-attachment: fixed;
         }
 
@@ -2075,7 +2105,7 @@
             justify-content: center;
             padding: 1.5rem;
             background:
-                radial-gradient(circle at 50% 30%, rgba(120, 200, 149, 0.10), transparent 45%),
+                radial-gradient(circle at 50% 30%, rgba(54, 163, 92, 0.12), transparent 45%),
                 var(--abyss);
             transition: opacity 0.6s ease, visibility 0.6s ease, transform 0.6s ease;
         }
@@ -2334,8 +2364,8 @@
             background: var(--surface-2);
             border: 1px solid var(--stroke-strong);
             box-shadow: 0 16px 40px -20px rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             opacity: 0;
             transform: translateY(16px);
             pointer-events: none;
@@ -2447,7 +2477,7 @@
             border-radius: 11px;
             border: 1px solid var(--stroke);
             outline: none;
-            background: rgba(3, 12, 19, 0.72);
+            background: rgba(255, 255, 255, 0.92);
             color: var(--foam);
             font: 0.76rem 'Inter', sans-serif;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -2512,7 +2542,7 @@
             border-radius: 10px;
             border: 1px solid var(--stroke);
             outline: none;
-            background: rgba(3, 12, 19, 0.65);
+            background: rgba(249, 255, 251, 0.95);
             color: var(--foam);
             font-size: 0.72rem;
         }
@@ -3261,6 +3291,20 @@
             }
         }
 
+
+        /* Calm green theme: reduced glow and visual intensity */
+        .brand-mark, .badge-green, .badge-pink, .pump-ring.on {
+            box-shadow: none !important;
+        }
+        .panel, .toast, .crew-card {
+            box-shadow: var(--shadow) !important;
+        }
+        .headline-grad {
+            background-size: 100% 100% !important;
+        }
+        @media (prefers-reduced-motion: no-preference) {
+            .iot-particle { opacity: 0.18; }
+        }
 </style>
 </head>
 
