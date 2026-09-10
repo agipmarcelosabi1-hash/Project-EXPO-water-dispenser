@@ -5031,6 +5031,254 @@ body.member-theme-agip .agip-character-close {
 }
 </style>
 
+
+<style id="agip-anime-desktop-v16">
+/* ============================================================
+   AGIP ONLY — REFINED ANIME DESKTOP CARD COMPOSITION
+   Inspired by the supplied reference: glass cards, large
+   character panel, layered mini cards, left alignment and
+   bottom dock. No app icons or copied app UI.
+   ============================================================ */
+
+body.member-theme-agip {
+  overflow-x: hidden !important;
+}
+
+/* Push Agip's dashboard composition left so the visual workspace
+   feels wider and starts from the left edge like the reference. */
+body.member-theme-agip #dashboard-root {
+  width: min(1240px, calc(100vw - 12px)) !important;
+  max-width: 1240px !important;
+  margin-left: 8px !important;
+  margin-right: auto !important;
+  transform: translateX(-34px) !important;
+  padding: 24px 16px 94px !important;
+}
+
+/* Large translucent "desktop sheet" */
+body.member-theme-agip #dashboard-root::before {
+  inset: 6px 0 48px !important;
+  border-radius: 38px !important;
+  background:
+    linear-gradient(135deg, rgba(240,248,255,.28), rgba(181,198,235,.12)),
+    radial-gradient(circle at 12% 12%, rgba(255,255,255,.18), transparent 20%),
+    radial-gradient(circle at 88% 82%, rgba(186,170,250,.14), transparent 24%) !important;
+  border: 1px solid rgba(255,255,255,.34) !important;
+  box-shadow:
+    0 26px 80px rgba(47,68,127,.17),
+    inset 0 1px 0 rgba(255,255,255,.23) !important;
+}
+
+/* Faux top browser-like card — visual only */
+body.member-theme-agip #dashboard-root::after {
+  content: "○   ◀   ▶      AGIP ANIME CONSOLE                                  ☆   +   ◉";
+  position: absolute;
+  left: 30px;
+  right: 30px;
+  top: 20px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: 18px;
+  background: rgba(232,240,254,.30);
+  border: 1px solid rgba(255,255,255,.36);
+  box-shadow: 0 10px 24px rgba(48,68,128,.10);
+  color: rgba(46,63,108,.78);
+  font: 700 10px/1 'Space Mono', monospace;
+  letter-spacing: .04em;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Keep all real dashboard content above the decorative shell. */
+body.member-theme-agip #dashboard-root > * {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Move the actual content down slightly to create the stacked-card
+   composition shown in the reference. */
+body.member-theme-agip #dashboard-root > section:nth-of-type(1) {
+  margin-top: 56px !important;
+}
+
+/* Hero area: left tall card + stacked info cards on right */
+body.member-theme-agip #dashboard-root > section:nth-of-type(1) {
+  grid-template-columns: 300px minmax(0, 1fr) !important;
+  gap: 18px !important;
+}
+
+body.member-theme-agip #dashboard-root > section:nth-of-type(1) > .panel:first-child {
+  min-height: 392px !important;
+  border-radius: 30px !important;
+  background:
+    linear-gradient(180deg, rgba(143,174,229,.42), rgba(97,119,185,.50)) !important;
+}
+
+body.member-theme-agip #dashboard-root > section:nth-of-type(1) > .flex {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 18px !important;
+}
+
+body.member-theme-agip #dashboard-root > section:nth-of-type(1) > .flex > .panel {
+  min-height: 185px !important;
+  border-radius: 28px !important;
+}
+
+/* Make the first right-hand card visually "hero" and the second one compact. */
+body.member-theme-agip #dashboard-root > section:nth-of-type(1) > .flex > .panel:first-child {
+  background:
+    linear-gradient(135deg, rgba(118,159,228,.55), rgba(141,119,199,.48)) !important;
+}
+
+body.member-theme-agip #dashboard-root > section:nth-of-type(1) > .flex > .panel:last-child {
+  min-height: 150px !important;
+  background:
+    linear-gradient(135deg, rgba(111,146,208,.48), rgba(159,132,205,.44)) !important;
+}
+
+/* Turbidity becomes a big wide dashboard card like the reference's
+   broad central panels. */
+body.member-theme-agip #dashboard-root > section:nth-of-type(2) {
+  margin-top: 18px !important;
+}
+
+body.member-theme-agip #dashboard-root > section:nth-of-type(2) > .turbidity-card {
+  min-height: 235px !important;
+  border-radius: 30px !important;
+  background:
+    linear-gradient(135deg, rgba(124,160,220,.50), rgba(161,142,214,.43)) !important;
+}
+
+/* Lower cards / member area keep rounded desktop-card rhythm. */
+body.member-theme-agip #dashboard-root > section:nth-of-type(3) > .panel {
+  border-radius: 30px !important;
+}
+
+/* Character card: larger, more central and closer to reference composition. */
+body.member-theme-agip .agip-character-card {
+  top: 104px !important;
+  right: 42px !important;
+  width: 265px !important;
+  height: 330px !important;
+  border-radius: 30px !important;
+  transform: rotate(.8deg) !important;
+  background: rgba(223,235,255,.38) !important;
+  border: 1px solid rgba(255,255,255,.48) !important;
+  box-shadow:
+    0 24px 62px rgba(50,67,126,.20),
+    0 0 0 7px rgba(255,255,255,.06) !important;
+}
+
+/* Put the supplied anime crop across the card with a little
+   glassy tint, like the reference's large central art panel. */
+body.member-theme-agip .agip-character-art {
+  background-position: 52% 15% !important;
+  filter: saturate(.96) contrast(1.03) !important;
+}
+
+body.member-theme-agip .agip-character-shade {
+  background:
+    linear-gradient(180deg, rgba(136,166,225,.03) 20%, rgba(77,86,152,.12) 50%, rgba(34,44,85,.75) 100%) !important;
+}
+
+body.member-theme-agip .agip-character-info {
+  left: 18px !important;
+  right: 18px !important;
+  bottom: 16px !important;
+}
+
+body.member-theme-agip .agip-character-info strong {
+  font-size: 26px !important;
+}
+
+/* Decorative mini cards that echo the reference's side widgets.
+   They do not contain controls or alter any existing functionality. */
+body.member-theme-agip #dashboard-root::marker { content: none; }
+
+body.member-theme-agip .panel,
+body.member-theme-agip .turbidity-card,
+body.member-theme-agip .crew-card,
+body.member-theme-agip .assistant-chat,
+body.member-theme-agip .assistant-widget {
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+/* Subtle glass borders and highlights */
+body.member-theme-agip .panel::after,
+body.member-theme-agip .turbidity-card::after,
+body.member-theme-agip .crew-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(120deg, rgba(255,255,255,.10), transparent 32%),
+    linear-gradient(300deg, rgba(226,217,255,.08), transparent 28%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Hide the old visual "botanical" remnants from prior themes. */
+body.member-theme-agip .panel::before,
+body.member-theme-agip .crew-card::before,
+body.member-theme-agip .turbidity-card::before,
+body.member-theme-agip .ambient-field,
+body.member-theme-agip .data-orbit {
+  display: none !important;
+  content: none !important;
+}
+
+/* Keep text/card content above the new highlight layer. */
+body.member-theme-agip .panel > *,
+body.member-theme-agip .turbidity-card > *,
+body.member-theme-agip .crew-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Left-aligned desktop composition at medium screens. */
+@media (max-width: 980px) {
+  body.member-theme-agip #dashboard-root {
+    transform: translateX(-12px) !important;
+    width: calc(100vw - 8px) !important;
+  }
+
+  body.member-theme-agip .agip-character-card {
+    width: 210px !important;
+    height: 270px !important;
+    right: 24px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body.member-theme-agip #dashboard-root {
+    transform: none !important;
+    width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  body.member-theme-agip #dashboard-root::after {
+    left: 14px;
+    right: 14px;
+  }
+
+  body.member-theme-agip .agip-character-card {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    height: 290px !important;
+    margin: 10px 0 16px !important;
+    transform: none !important;
+  }
+}
+</style>
+
 </head>
 
 <body class="antialiased pb-16">
