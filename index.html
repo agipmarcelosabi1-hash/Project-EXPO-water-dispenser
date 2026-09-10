@@ -3306,6 +3306,245 @@
             .iot-particle { opacity: 0.18; }
         }
 </style>
+
+<style id="final-muted-green-theme">
+:root {
+  --abyss: #9bb8a4;
+  --depth: #abc5b2;
+  --surface: rgba(194, 214, 199, 0.96);
+  --surface-2: rgba(205, 222, 209, 0.98);
+  --stroke: rgba(42, 91, 57, 0.20);
+  --stroke-strong: rgba(42, 91, 57, 0.34);
+  --foam: #224d31;
+  --mist: #5f7666;
+  --aqua: #4f875e;
+  --aqua-dim: rgba(79, 135, 94, 0.12);
+  --violet: #c98298;
+  --amber: #b98635;
+  --coral: #c46f87;
+  --kelp: #4f8a5c;
+}
+
+html, body {
+  background-color: #b7cfbd !important;
+  color: var(--foam) !important;
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(92, 143, 103, 0.10), transparent 30%),
+    radial-gradient(circle at 86% 24%, rgba(201, 130, 152, 0.055), transparent 24%),
+    linear-gradient(135deg, #b8d0bd 0%, #adc7b3 48%, #bfd5c3 100%) !important;
+}
+
+body::before {
+  background-image:
+    linear-gradient(rgba(54, 102, 66, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(54, 102, 66, 0.035) 1px, transparent 1px) !important;
+  opacity: .65 !important;
+}
+
+body::after {
+  background:
+    radial-gradient(circle at 20% 25%, rgba(100, 153, 111, 0.07), transparent 20%),
+    radial-gradient(circle at 80% 20%, rgba(201, 130, 152, 0.045), transparent 18%),
+    radial-gradient(circle at 50% 80%, rgba(100, 153, 111, 0.05), transparent 25%) !important;
+  filter: blur(12px) !important;
+  animation: none !important;
+}
+
+.panel,
+.toast,
+.crew-modal,
+.auth-method-card,
+.face-access,
+.voice-gate-card {
+  background: var(--surface) !important;
+  border-color: var(--stroke) !important;
+  box-shadow: 0 10px 26px -22px rgba(35, 76, 46, 0.28) !important;
+}
+
+.topbar {
+  background: rgba(181, 207, 188, 0.96) !important;
+  border-bottom-color: var(--stroke) !important;
+}
+
+.crew-card,
+.turbidity-card {
+  background: rgba(192, 214, 198, 0.98) !important;
+  border-color: var(--stroke) !important;
+}
+
+.crew-card:hover {
+  background: rgba(201, 220, 206, 0.99) !important;
+}
+
+.cup-inner {
+  background: rgba(169, 198, 175, 0.88) !important;
+}
+
+.auth-method-btn {
+  background: linear-gradient(145deg, #a9c3ae, #9fb9a5) !important;
+  color: var(--foam) !important;
+  border-color: rgba(42, 91, 57, 0.25) !important;
+  box-shadow: none !important;
+}
+
+.auth-method-btn:hover {
+  background: linear-gradient(145deg, #b0cbb6, #a5bfaa) !important;
+  box-shadow: 0 8px 20px -18px rgba(35, 76, 46, 0.35) !important;
+}
+
+.auth-method-btn .method-icon {
+  background: rgba(79, 135, 94, 0.10) !important;
+  border-color: rgba(79, 135, 94, 0.20) !important;
+  color: var(--aqua) !important;
+}
+
+.auth-method-badge,
+.crew-role,
+.crew-badge,
+.panel-eyebrow::before,
+.voice-status-line.recognized {
+  color: var(--aqua) !important;
+}
+
+.voice-gate-title,
+.turbidity-title,
+.crew-name,
+.crew-modal-name,
+.hud-item .v {
+  color: var(--foam) !important;
+}
+
+.voice-gate-sub,
+.voice-status-line,
+.crew-modal-desc,
+.crew-role,
+.crew-nim,
+.hud-item .k,
+.cup-caption {
+  color: var(--mist) !important;
+}
+
+.badge-aqua,
+.badge-kelp {
+  background: rgba(79, 135, 94, 0.12) !important;
+  border-color: rgba(79, 135, 94, 0.28) !important;
+  color: #477b55 !important;
+  box-shadow: none !important;
+}
+
+.badge-neutral {
+  background: rgba(95, 118, 102, 0.09) !important;
+  border-color: rgba(95, 118, 102, 0.20) !important;
+  color: #587060 !important;
+}
+
+.badge-coral,
+.badge-pink {
+  background: rgba(196, 111, 135, 0.10) !important;
+  border-color: rgba(196, 111, 135, 0.24) !important;
+  color: #ad6479 !important;
+  box-shadow: none !important;
+}
+
+#systemOpening {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(79, 135, 94, 0.07), transparent 18%),
+    radial-gradient(circle at 50% 50%, rgba(201, 130, 152, 0.045), transparent 34%),
+    #b7cfbd !important;
+}
+
+#systemOpening .opening-grid {
+  opacity: .12 !important;
+}
+
+#systemOpening .opening-vignette {
+  background: radial-gradient(circle, transparent 30%, rgba(55, 91, 63, 0.08) 100%) !important;
+}
+
+.headline-grad {
+  background: linear-gradient(105deg, #234e31 20%, #4f875e 50%, #b66d84 80%) !important;
+  background-size: 100% 100% !important;
+  animation: none !important;
+}
+
+.brand-mark {
+  background: #abc5b1 !important;
+  box-shadow: 0 2px 8px rgba(65, 111, 76, 0.12), inset 0 0 5px rgba(65, 111, 76, 0.05) !important;
+  animation: none !important;
+}
+
+.voice-mic-btn {
+  background: #a7c1ad !important;
+  border: 1px solid rgba(79, 135, 94, 0.28) !important;
+  box-shadow: 0 3px 12px rgba(60, 99, 68, 0.10) !important;
+}
+
+.voice-mic-btn.listening {
+  background: #d1a1ae !important;
+  border-color: rgba(173, 100, 121, 0.35) !important;
+  box-shadow: 0 3px 12px rgba(173, 100, 121, 0.12) !important;
+}
+
+.voice-widget,
+.assistant-chat {
+  background: rgba(192, 214, 198, 0.98) !important;
+  border-color: var(--stroke) !important;
+  box-shadow: 0 10px 26px -22px rgba(35, 76, 46, 0.25) !important;
+}
+
+.gauge-track {
+  stroke: rgba(49, 96, 61, 0.16) !important;
+}
+
+.gauge-fill {
+  stroke: var(--aqua) !important;
+  filter: none !important;
+}
+
+.turbidity-meter {
+  background: rgba(58, 101, 66, 0.10) !important;
+  border-color: rgba(58, 101, 66, 0.12) !important;
+}
+
+.turbidity-meter-fill {
+  background: #5f986c !important;
+}
+
+.pump-ring {
+  background: rgba(79, 135, 94, 0.07) !important;
+  border-color: rgba(58, 101, 66, 0.28) !important;
+}
+
+.pump-ring.on {
+  background: rgba(79, 135, 94, 0.13) !important;
+  border-color: rgba(79, 135, 94, 0.40) !important;
+  box-shadow: 0 0 10px rgba(79, 135, 94, 0.14) !important;
+}
+
+.cup-water {
+  background: linear-gradient(180deg, #5a9b6a 0%, #4e855b 100%) !important;
+}
+
+.cup-water.murky {
+  background: linear-gradient(180deg, #c58f4b 0%, #9a6d31 100%) !important;
+}
+
+.conn-pill {
+  background: rgba(195, 216, 200, 0.96) !important;
+  border-color: var(--stroke) !important;
+}
+
+.dot {
+  box-shadow: 0 0 5px currentColor !important;
+}
+
+@media (max-width: 700px) {
+  .auth-methods { grid-template-columns: 1fr !important; }
+}
+</style>
 </head>
 
 <body class="antialiased pb-16">
